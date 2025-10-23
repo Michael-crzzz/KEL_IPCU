@@ -51,39 +51,48 @@
                             </div>
                         </div>
 
-                        <!-- Limitation as Dropdown -->
+                        <!-- Limitation with Single Toggle Switch -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Limitation</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="Limitation" value="Glasses" id="glasses" />
-                                        <label class="form-check-label" for="glasses">Glasses</label>
+                            <div class="form-check form-switch mb-3">
+                                <label class="form-check-label fw-bold" for="toggleLimitations">Limitations</label>
+                                <input class="form-check-input" type="checkbox" id="toggleLimitations" role="switch">
+                            </div>
+                            <div id="limitationsContainer" class="d-none">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input limitation-checkbox" type="checkbox" id="glasses" name="Limitation" value="Glasses">
+                                                <label class="form-check-label" for="glasses">Glasses</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input limitation-checkbox" type="checkbox" id="beardGrowth" name="Limitation" value="Beard Growth">
+                                                <label class="form-check-label" for="beardGrowth">Beard Growth</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input limitation-checkbox" type="checkbox" id="dentures" name="Limitation" value="Dentures">
+                                                <label class="form-check-label" for="dentures">Dentures</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="Limitation" value="Beard Growth" id="beardGrowth" />
-                                        <label class="form-check-label" for="beardGrowth">Beard Growth</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="Limitation" value="Dentures" id="dentures" />
-                                        <label class="form-check-label" for="dentures">Dentures</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="Limitation" value="Cosmetic surgery" id="cosmeticSurgery" />
-                                        <label class="form-check-label" for="cosmeticSurgery">Cosmetic surgery</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="Limitation" value="Facial scarring" id="facialScarring" />
-                                        <label class="form-check-label" for="facialScarring">Facial scarring</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="otherCheckbox" name="Limitation" value="Other" />
-                                        <label class="form-check-label" for="otherCheckbox">Other</label>
-                                    </div>
-                                    <div id="otherTextContainer" class="d-none mt-2">
-                                        <input type="text" id="otherText" name="OtherLimitation" class="form-control" placeholder="Specify other limitation" />
+                                    <div class="col-md-6">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input limitation-checkbox" type="checkbox" id="cosmeticSurgery" name="Limitation" value="Cosmetic Surgery">
+                                                <label class="form-check-label" for="cosmeticSurgery">Cosmetic Surgery</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input limitation-checkbox" type="checkbox" id="facialScarring" name="Limitation" value="Facial Scarring">
+                                                <label class="form-check-label" for="facialScarring">Facial Scarring</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input limitation-checkbox" type="checkbox" id="otherCheckbox" name="Limitation" value="Other">
+                                                <label class="form-check-label" for="otherCheckbox">Other</label>
+                                            </div>
+                                            <div id="otherTextContainer" class="d-none mt-2">
+                                                <input type="text" id="otherText" name="OtherLimitation" class="form-control" placeholder="Specify other limitation" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -127,12 +136,11 @@
                                     </select>
                                     <span asp-validation-for="Respiratory_Type" class="text-danger"></span>
                                 </div>
-
                             </div>
 
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label asp-for="Model" class="form-label fw-bold"></label>
+                                    <label asp-for="Model" class="form-label fw-bold">Model</label>
                                     <input asp-for="Model" class="form-control" placeholder="Enter Model" />
                                     <span asp-validation-for="Model" class="text-danger"></span>
                                 </div>
@@ -174,7 +182,7 @@
                                     <input class="form-check-input" asp-for="Reading" />
                                     <label class="form-check-label">@Html.DisplayNameFor(model => model.Reading)</label>
                                 </div>
-                                <div class="form-check">
+                                <div form-check">
                                     <input class="form-check-input" asp-for="Bending_Jogging" />
                                     <label class="form-check-label">Bending Jogging</label>
                                 </div>
@@ -187,16 +195,22 @@
                             </div>
                         </div>
 
+                        <!-- Fit Tester Dropdown -->
                         <div class="mb-3 mt-3">
-                            <label asp-for="Name_of_Fit_Tester" class="form-label fw-bold">Name of Fit Tester</label>
-                            <input asp-for="Name_of_Fit_Tester" class="form-control" placeholder="Enter Fit Tester Name" />
+                            <label asp-for="Name_of_Fit_Tester" class="form-label fw-bold">Fit Tester</label>
+                            <select asp-for="Name_of_Fit_Tester" class="form-select" required>
+                                <option value="">Select Fit Tester</option>
+                                <option value="MVML">MVML</option>
+                                <option value="ABV">ABV</option>
+                                <option value="IPM">IPM</option>
+                                <option value="JRH">JRH</option>
+                                <option value="CGM">CGM</option>
+                            </select>
                             <span asp-validation-for="Name_of_Fit_Tester" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="DUO_Tester" class="form-label fw-bold">
-                                Department/Unit/Office:
-                            </label>
+                            <label asp-for="DUO_Tester" class="form-label fw-bold">Department/Unit/Office</label>
                             <input asp-for="DUO_Tester" class="form-control" placeholder="Enter Department/Unit/Office" />
                             <span asp-validation-for="DUO_Tester" class="text-danger"></span>
                         </div>
@@ -213,28 +227,63 @@
 </div>
 <div asp-validation-summary="All" class="text-danger"></div>
 
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
-        let otherCheckbox = document.getElementById("otherCheckbox");
-        let otherTextContainer = document.getElementById("otherTextContainer");
+<style>
+    .form-check.form-switch .form-check-input {
+        width: 2.5em;
+        height: 1.25em;
+        cursor: pointer;
+        margin-left: -3.5em;
+    }
 
-        otherCheckbox.addEventListener("change", function () {
-            if (this.checked) {
-                otherTextContainer.classList.remove("d-none");
-            } else {
-                otherTextContainer.classList.add("d-none");
-            }
-        });
-    });
+    .form-check.form-switch .form-check-label {
+        font-size: 1rem;
+        color: black;
+    }
 
-</script>
+    .form-check.form-switch {
+        padding-left: 3.5em;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-check .form-check-label {
+        font-size: 1rem;
+        color: #495057;
+    }
+
+    .gap-2 {
+        gap: 0.5rem;
+    }
+
+    #limitationsContainer.d-none {
+        display: none !important;
+    }
+</style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        let otherCheckbox = document.getElementById("otherCheckbox");
-        let otherTextContainer = document.getElementById("otherTextContainer");
-        let otherText = document.getElementById("otherText");
+        // Handle single toggle for limitations
+        const toggleLimitations = document.getElementById("toggleLimitations");
+        const limitationsContainer = document.getElementById("limitationsContainer");
+        const checkboxes = document.querySelectorAll(".limitation-checkbox");
+        const otherTextContainer = document.getElementById("otherTextContainer");
+        const otherText = document.getElementById("otherText");
+        const otherCheckbox = document.getElementById("otherCheckbox");
 
+        toggleLimitations.addEventListener("change", function () {
+            if (this.checked) {
+                limitationsContainer.classList.remove("d-none");
+            } else {
+                limitationsContainer.classList.add("d-none");
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                otherTextContainer.classList.add("d-none");
+                otherText.value = "";
+                otherText.required = false;
+            }
+        });
+
+        // Handle "Other" checkbox
         otherCheckbox.addEventListener("change", function () {
             if (this.checked) {
                 otherTextContainer.classList.remove("d-none");
@@ -242,22 +291,22 @@
             } else {
                 otherTextContainer.classList.add("d-none");
                 otherText.required = false;
-                otherText.value = '';
+                otherText.value = "";
             }
         });
 
-        // Optional: Add validation before form submission
-        document.querySelector('form').addEventListener('submit', function(e) {
+        // Form validation for "Other" text input
+        document.querySelector("form").addEventListener("submit", function (e) {
             if (otherCheckbox.checked && !otherText.value.trim()) {
                 e.preventDefault();
-                alert('Please specify the other limitation');
+                alert("Please specify the other limitation");
             }
         });
     });
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    document.getElementById('EmployeeId').addEventListener('blur', function () {
+    document.getElementById("EmployeeId").addEventListener("blur", function () {
         const empId = this.value.trim();
 
         if (empId !== "") {
@@ -267,22 +316,23 @@
                     return response.json();
                 })
                 .then(data => {
-                    document.getElementById('HCW_Name').value = data.fullName;
-                    document.getElementById('Professional_Category').value = data.position;
-                    document.getElementById('DUO').value = data.department;
+                    document.getElementById("HCW_Name").value = data.fullName;
+                    document.getElementById("Professional_Category").value = data.position;
+                    document.getElementById("DUO").value = data.department;
                 })
                 .catch(err => {
-                    document.getElementById('HCW_Name').value = "";
-                    document.getElementById('Professional_Category').value = "";
-                    document.getElementById('DUO').value = "";
+                    document.getElementById("HCW_Name").value = "";
+                    document.getElementById("Professional_Category").value = "";
+                    document.getElementById("DUO").value = "";
                     console.error("Error fetching employee details:", err);
                 });
         } else {
-            document.getElementById('HCW_Name').value = "";
-            document.getElementById('Professional_Category').value = "";
-            document.getElementById('DUO').value = "";
+            document.getElementById("HCW_Name").value = "";
+            document.getElementById("Professional_Category").value = "";
+            document.getElementById("DUO").value = "";
         }
     });
-
 </script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+```
