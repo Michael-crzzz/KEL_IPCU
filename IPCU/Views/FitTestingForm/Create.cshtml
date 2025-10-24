@@ -22,7 +22,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label asp-for="EmployeeId" class="form-label fw-bold">EmployeeId</label>
+                                    <label asp-for="EmployeeId" class="form-label fw-bold">EmployeeID</label>
                                     <input asp-for="EmployeeId" class="form-control" id="EmployeeId" />
                                     <span asp-validation-for="EmployeeId" class="text-danger"></span>
                                 </div>
@@ -127,11 +127,10 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label asp-for="Respiratory_Type" class="form-label fw-bold">Respiratory Type</label>
+                                    <label asp-for="Respiratory_Type" class="form-label fw-bold">Respirator Type</label>
                                     <select asp-for="Respiratory_Type" class="form-control">
-                                        <option value="">Select Respiratory Type</option>
+                                        <option value="">Select Respirator Type</option>
                                         <option value="BTL">BTL</option>
-                                        <option value="Flat Type">Flat Type</option>
                                         <option value="3M Aura">3M Aura</option>
                                     </select>
                                     <span asp-validation-for="Respiratory_Type" class="text-danger"></span>
@@ -153,7 +152,11 @@
 
                         <div class="mb-3">
                             <label asp-for="Size" class="form-label fw-bold">Size</label>
-                            <input asp-for="Size" type="text" class="form-control" placeholder="Enter Size" />
+                            <select asp-for="Model" class="form-select">
+                                <option value="">Select Size</option>
+                                <option value="Regular">Regular</option>
+                                <option value="1870+">1870+</option>
+                            </select>
                             <span asp-validation-for="Size" class="text-danger"></span>
                         </div>
 
