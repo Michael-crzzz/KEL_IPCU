@@ -22,6 +22,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label asp-for="EmployeeId" class="form-label fw-bold">Employee ID</label>
+                                    <input asp-for="EmployeeId" class="form-control" id="EmployeeId" />
+                                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label asp-for="HCW_Name" class="form-label fw-bold">Healthcare Worker</label>
                                     <input asp-for="HCW_Name" class="form-control" id="HCW_Name" />
                                     <span asp-validation-for="HCW_Name" class="text-danger"></span>
@@ -33,13 +40,6 @@
                                     <label asp-for="DUO" class="form-label fw-bold">Department/Unit/Office</label>
                                     <input asp-for="DUO" class="form-control" id="DUO" />
                                     <span asp-validation-for="DUO" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="EmployeeId" class="form-label fw-bold">EmployeeId</label>
-                                    <input asp-for="EmployeeId" class="form-control" id="EmployeeId" />
-                                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -127,11 +127,10 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label asp-for="Respiratory_Type" class="form-label fw-bold">Respiratory Type</label>
+                                    <label asp-for="Respiratory_Type" class="form-label fw-bold">Respirator Type</label>
                                     <select asp-for="Respiratory_Type" class="form-control">
-                                        <option value="">Select Respiratory Type</option>
+                                        <option value="">Select Respirator Type</option>
                                         <option value="BTL">BTL</option>
-                                        <option value="Flat Type">Flat Type</option>
                                         <option value="3M Aura">3M Aura</option>
                                     </select>
                                     <span asp-validation-for="Respiratory_Type" class="text-danger"></span>
@@ -153,7 +152,11 @@
 
                         <div class="mb-3">
                             <label asp-for="Size" class="form-label fw-bold">Size</label>
-                            <input asp-for="Size" type="text" class="form-control" placeholder="Enter Size" />
+                            <select asp-for="Size" class="form-select">
+                                <option value="">Select Size</option>
+                                <option value="Regular">Regular</option>
+                                <option value="1870+">1870+</option>
+                            </select>
                             <span asp-validation-for="Size" class="text-danger"></span>
                         </div>
 
@@ -215,7 +218,34 @@
 
                         <div class="mb-3">
                             <label asp-for="DUO_Tester" class="form-label fw-bold">Department/Unit/Office</label>
-                            <input asp-for="DUO_Tester" class="form-control" placeholder="Enter Department/Unit/Office" />
+                            <select asp-for="DUO_Tester" class="form-select">
+                                <option value="">Select Department/Unit/Office</option>
+                                <option value="Unit 2A">Unit 2A</option>
+                                <option value="Unit 2B">Unit 2B</option>
+                                <option value="Unit 2C">Unit 2C</option>
+                                <option value="Unit 2D">Unit 2D</option>
+                                <option value="Unit 2E/Ext">Unit 2E/Ext</option>
+                                <option value="Unit 2F/2G">Unit 2F/2G</option>
+                                <option value="Unit 2H">Unit 2H</option>
+                                <option value="Unit 3A">Unit 3A</option>
+                                <option value="Unit 3B">Unit 3B</option>
+                                <option value="Unit 3C">Unit 3C</option>
+                                <option value="Unit 3D/Celtran">Unit 3D/Celtran</option>
+                                <option value="Unit 3E">Unit 3E</option>
+                                <option value="Unit 3F">Unit 3F</option>
+                                <option value="ICU">ICU</option>
+                                <option value="ER">ER</option>
+                                <option value="PD">PD</option>
+                                <option value="HDU">HDU</option>
+                                <option value="AEUC">AEUC</option>
+                                <option value="ORU">ORU</option>
+                                <option value="CCRU">CCRU</option>
+                                <option value="iVASC">iVASC</option>
+                                <option value="OPS">OPS</option>
+                                <option value="AITU">AITU</option>
+                                <option value="PCU">PCU</option>
+                                <option value="IPCU">IPCU</option>
+                            </select>
                             <span asp-validation-for="DUO_Tester" class="text-danger"></span>
                         </div>
 
@@ -265,49 +295,79 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Handle single toggle for limitations
         const toggleLimitations = document.getElementById("toggleLimitations");
         const limitationsContainer = document.getElementById("limitationsContainer");
         const checkboxes = document.querySelectorAll(".limitation-checkbox");
         const otherTextContainer = document.getElementById("otherTextContainer");
         const otherText = document.getElementById("otherText");
         const otherCheckbox = document.getElementById("otherCheckbox");
+        const form = document.querySelector("form");
 
+        // Handle showing/hiding limitations
         toggleLimitations.addEventListener("change", function () {
             if (this.checked) {
                 limitationsContainer.classList.remove("d-none");
             } else {
+                // Hide and reset everything
                 limitationsContainer.classList.add("d-none");
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = false;
+
+                checkboxes.forEach(cb => {
+                    cb.checked = false;
+                    cb.removeAttribute("required");
                 });
+
                 otherTextContainer.classList.add("d-none");
                 otherText.value = "";
-                otherText.required = false;
+                otherText.removeAttribute("required");
             }
         });
 
-        // Handle "Other" checkbox
+        // Handle "Other" checkbox behavior
         otherCheckbox.addEventListener("change", function () {
             if (this.checked) {
                 otherTextContainer.classList.remove("d-none");
-                otherText.required = true;
+                otherText.setAttribute("required", "required");
             } else {
                 otherTextContainer.classList.add("d-none");
-                otherText.required = false;
+                otherText.removeAttribute("required");
                 otherText.value = "";
             }
         });
 
-        // Form validation for "Other" text input
-        document.querySelector("form").addEventListener("submit", function (e) {
-            if (otherCheckbox.checked && !otherText.value.trim()) {
-                e.preventDefault();
-                alert("Please specify the other limitation");
+        // Form validation
+        form.addEventListener("submit", function (e) {
+            if (toggleLimitations.checked) {
+                // Check if at least one limitation is selected
+                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                if (!anyChecked) {
+                    e.preventDefault();
+                    alert("Please select at least one limitation.");
+                    return;
+                }
+
+                // Check if "Other" is selected but empty
+                if (otherCheckbox.checked && !otherText.value.trim()) {
+                    e.preventDefault();
+                    alert("Please specify the other limitation.");
+                    return;
+                }
+            } else {
+                // Toggle is off: ensure no hidden required fields block submission
+                checkboxes.forEach(cb => cb.removeAttribute("required"));
+                otherText.removeAttribute("required");
             }
         });
+
+        // ✅ Ensure that on page load, if toggle is off, nothing is required
+        if (!toggleLimitations.checked) {
+            checkboxes.forEach(cb => cb.removeAttribute("required"));
+            otherText.removeAttribute("required");
+        }
     });
 </script>
+
+
+
 
 <script>
     document.getElementById("EmployeeId").addEventListener("blur", function () {

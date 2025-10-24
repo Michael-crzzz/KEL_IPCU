@@ -21,7 +21,7 @@ namespace IPCU.Models
         public string Professional_Category { get; set; }
 
         [Display(Name = "Limitation")]
-        public string Limitation { get; set; }
+        public string?  Limitation { get; set; }
 
         [Required]
         public string Fit_Test_Solution { get; set; }
