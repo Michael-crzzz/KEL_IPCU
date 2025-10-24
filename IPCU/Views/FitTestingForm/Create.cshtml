@@ -22,6 +22,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label asp-for="EmployeeId" class="form-label fw-bold">EmployeeId</label>
+                                    <input asp-for="EmployeeId" class="form-control" id="EmployeeId" />
+                                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label asp-for="HCW_Name" class="form-label fw-bold">Healthcare Worker</label>
                                     <input asp-for="HCW_Name" class="form-control" id="HCW_Name" />
                                     <span asp-validation-for="HCW_Name" class="text-danger"></span>
@@ -33,13 +40,6 @@
                                     <label asp-for="DUO" class="form-label fw-bold">Department/Unit/Office</label>
                                     <input asp-for="DUO" class="form-control" id="DUO" />
                                     <span asp-validation-for="DUO" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="EmployeeId" class="form-label fw-bold">EmployeeId</label>
-                                    <input asp-for="EmployeeId" class="form-control" id="EmployeeId" />
-                                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -292,49 +292,79 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Handle single toggle for limitations
         const toggleLimitations = document.getElementById("toggleLimitations");
         const limitationsContainer = document.getElementById("limitationsContainer");
         const checkboxes = document.querySelectorAll(".limitation-checkbox");
         const otherTextContainer = document.getElementById("otherTextContainer");
         const otherText = document.getElementById("otherText");
         const otherCheckbox = document.getElementById("otherCheckbox");
+        const form = document.querySelector("form");
 
+        // Handle showing/hiding limitations
         toggleLimitations.addEventListener("change", function () {
             if (this.checked) {
                 limitationsContainer.classList.remove("d-none");
             } else {
+                // Hide and reset everything
                 limitationsContainer.classList.add("d-none");
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = false;
+
+                checkboxes.forEach(cb => {
+                    cb.checked = false;
+                    cb.removeAttribute("required");
                 });
+
                 otherTextContainer.classList.add("d-none");
                 otherText.value = "";
-                otherText.required = false;
+                otherText.removeAttribute("required");
             }
         });
 
-        // Handle "Other" checkbox
+        // Handle "Other" checkbox behavior
         otherCheckbox.addEventListener("change", function () {
             if (this.checked) {
                 otherTextContainer.classList.remove("d-none");
-                otherText.required = true;
+                otherText.setAttribute("required", "required");
             } else {
                 otherTextContainer.classList.add("d-none");
-                otherText.required = false;
+                otherText.removeAttribute("required");
                 otherText.value = "";
             }
         });
 
-        // Form validation for "Other" text input
-        document.querySelector("form").addEventListener("submit", function (e) {
-            if (otherCheckbox.checked && !otherText.value.trim()) {
-                e.preventDefault();
-                alert("Please specify the other limitation");
+        // Form validation
+        form.addEventListener("submit", function (e) {
+            if (toggleLimitations.checked) {
+                // Check if at least one limitation is selected
+                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                if (!anyChecked) {
+                    e.preventDefault();
+                    alert("Please select at least one limitation.");
+                    return;
+                }
+
+                // Check if "Other" is selected but empty
+                if (otherCheckbox.checked && !otherText.value.trim()) {
+                    e.preventDefault();
+                    alert("Please specify the other limitation.");
+                    return;
+                }
+            } else {
+                // Toggle is off: ensure no hidden required fields block submission
+                checkboxes.forEach(cb => cb.removeAttribute("required"));
+                otherText.removeAttribute("required");
             }
         });
+
+        // ✅ Ensure that on page load, if toggle is off, nothing is required
+        if (!toggleLimitations.checked) {
+            checkboxes.forEach(cb => cb.removeAttribute("required"));
+            otherText.removeAttribute("required");
+        }
     });
 </script>
+
+
+
 
 <script>
     document.getElementById("EmployeeId").addEventListener("blur", function () {
