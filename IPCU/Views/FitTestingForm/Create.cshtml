@@ -215,9 +215,37 @@
 
                         <div class="mb-3">
                             <label asp-for="DUO_Tester" class="form-label fw-bold">Department/Unit/Office</label>
-                            <input asp-for="DUO_Tester" class="form-control" placeholder="Enter Department/Unit/Office" />
+                            <select asp-for="DUO_Tester" class="form-select">
+                                <option value="">Select Department/Unit/Office</option>
+                                <option value="Unit 2A">Unit 2A</option>
+                                <option value="Unit 2B">Unit 2B</option>
+                                <option value="Unit 2C">Unit 2C</option>
+                                <option value="Unit 2D">Unit 2D</option>
+                                <option value="Unit 2E/Ext">Unit 2E/Ext</option>
+                                <option value="Unit 2F/2G">Unit 2F/2G</option>
+                                <option value="Unit 2H">Unit 2H</option>
+                                <option value="Unit 3A">Unit 3A</option>
+                                <option value="Unit 3B">Unit 3B</option>
+                                <option value="Unit 3C">Unit 3C</option>
+                                <option value="Unit 3D/Celtran">Unit 3D/Celtran</option>
+                                <option value="Unit 3E">Unit 3E</option>
+                                <option value="Unit 3F">Unit 3F</option>
+                                <option value="ICU">ICU</option>
+                                <option value="ER">ER</option>
+                                <option value="PD">PD</option>
+                                <option value="HDU">HDU</option>
+                                <option value="AEUC">AEUC</option>
+                                <option value="ORU">ORU</option>
+                                <option value="CCRU">CCRU</option>
+                                <option value="iVASC">iVASC</option>
+                                <option value="OPS">OPS</option>
+                                <option value="AITU">AITU</option>
+                                <option value="PCU">PCU</option>
+                                <option value="IPCU">IPCU</option>
+                            </select>
                             <span asp-validation-for="DUO_Tester" class="text-danger"></span>
                         </div>
+
 
                         <div class="d-flex justify-content-between">
                             <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back</a>
