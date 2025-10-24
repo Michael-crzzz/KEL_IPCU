@@ -100,12 +100,19 @@ namespace IPCU.Controllers
         // GET: FitTestingForm/Create
         public IActionResult Create()
         {
+            // Add the dropdown list for DUO_Tester
+            ViewBag.DUO_Tester = new SelectList(new List<string>
+    {
+        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
+        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
+        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
+        "iVASC", "OPS", "AITU", "PCU", "IPCU"
+    });
+
             return View();
         }
 
         // POST: FitTestingForm/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FitTestingForm fitTestingForm, string? OtherLimitation)
@@ -119,19 +126,28 @@ namespace IPCU.Controllers
 
                 if (limitations != null && limitations.Any())
                 {
-                    // If "Other" is selected and has a value
                     if (limitations.Contains("Other"))
                     {
                         if (string.IsNullOrWhiteSpace(OtherLimitation))
                         {
                             ModelState.AddModelError("Limitation", "Please specify the other limitation");
+
+                            // Rebuild dropdown when validation fails
+                            ViewBag.DUO_Tester = new SelectList(new List<string>
+                    {
+                        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
+                        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
+                        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
+                        "iVASC", "OPS", "AITU", "PCU", "IPCU"
+                    });
+
                             return View(fitTestingForm);
                         }
+
                         limitations.Remove("Other");
                         limitations.Add(OtherLimitation.Trim());
                     }
 
-                    // Concatenate the limitations into a single string
                     fitTestingForm.Limitation = string.Join(", ", limitations.Where(x => !string.IsNullOrWhiteSpace(x)));
                 }
                 else
@@ -141,15 +157,12 @@ namespace IPCU.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    // Set the SubmittedAt and ExpiringAt fields
                     fitTestingForm.SubmittedAt = DateTime.Now;
-                    fitTestingForm.ExpiringAt = fitTestingForm.SubmittedAt.AddYears(1); // Set ExpiringAt
+                    fitTestingForm.ExpiringAt = fitTestingForm.SubmittedAt.AddYears(1);
 
-                    // Add the new FitTestingForm record
                     _context.Add(fitTestingForm);
                     await _context.SaveChangesAsync();
 
-                    // Save the initial state to FitTestingFormHistory
                     var history = new FitTestingFormHistory
                     {
                         FitTestingFormId = fitTestingForm.Id,
@@ -180,8 +193,18 @@ namespace IPCU.Controllers
                 ModelState.AddModelError("", "Error processing limitations: " + ex.Message);
             }
 
+            // Rebuild dropdown before returning the view if there’s any failure
+            ViewBag.DUO_Tester = new SelectList(new List<string>
+    {
+        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
+        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
+        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
+        "iVASC", "OPS", "AITU", "PCU", "IPCU"
+    });
+
             return View(fitTestingForm);
         }
+
 
 
 
@@ -357,6 +380,7 @@ namespace IPCU.Controllers
         "Resident", "Consultants - Plantilla", "Visiting Consultant", "Consultant",
         "Consultant - Non-Plantilla", "MO III"
     };
+
             var duoList = new List<string>
     {
         "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
@@ -364,121 +388,110 @@ namespace IPCU.Controllers
         "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
         "iVASC", "OPS", "AITU", "PCU", "IPCU"
     };
+
             var duoMedical = new List<string>
     {
         "Adult Nephrology", "Surgery", "OTVS", "Pedia Nephrology", "Urology", "IM", "Anesthesiology"
     };
+
             var duoAllied = new List<string>
     {
         "Cardiology", "HOPE", "Nuclear", "Radiology/DMITRI", "PMRS", "PLMD", "Pulmonology"
     };
+
             var fitTests = _context.FitTestingForm.ToList();
             var currentDate = DateTime.Now;
 
-
-            // Get "Attendance for Physicians" (only Passed results)
-            var attendanceForPhysicians = _context.FitTestingForm.FromSqlRaw(@"
-    SELECT * FROM FitTestingForm
-    WHERE Professional_Category IN ({0}) AND Test_Results = {1}",
-                string.Join(",", physicianCategories.Select(c => $"'{c}'")), "Passed")
+            // ------------------------------
+            // Attendance: Physicians
+            // ------------------------------
+            var attendanceForPhysicians = fitTests
+                .Where(f => physicianCategories.Contains(f.Professional_Category) && f.Test_Results == "Passed")
                 .ToList();
 
+            // ------------------------------
+            // Attendance: Nursing and Allied
+            // ------------------------------
+            var attendanceForNursingAndAllied = fitTests
+                .Where(f => !physicianCategories.Contains(f.Professional_Category) && f.Test_Results == "Passed")
+                .Select(f => new FitTestingReportViewModel
+                {
+                    HCW_Name = f.HCW_Name,
+                    DUO = f.DUO,
+                    Professional_Category = f.Professional_Category,
+                    Fit_Test_Solution = f.Fit_Test_Solution,
+                    Test_Results = f.ExpiringAt < currentDate ? "Expired" : "Passed",
+                    Name_of_Fit_Tester = f.Name_of_Fit_Tester,
+                    SubmittedAt = f.SubmittedAt,
+                    ExpiringAt = f.ExpiringAt
+                })
+                .ToList();
 
-
-            var attendanceForNursingAndAllied = _context.FitTestingForm
-    .FromSqlRaw(@"
-        SELECT 
-            HCW_Name,
-            DUO,
-            Professional_Category,
-            Fit_Test_Solution,
-            CASE 
-                WHEN ExpiringAt < {0} THEN 'Expired' 
-                ELSE 'Passed' 
-            END AS Test_Results,
-            Name_of_Fit_Tester,
-            SubmittedAt,
-            ExpiringAt
-        FROM FitTestingForm
-        WHERE Professional_Category NOT IN ({1}) AND Test_Results = 'Passed'",
-        currentDate,
-        string.Join(",", physicianCategories.Select(c => $"'{c}'")))
-    .Select(f => new FitTestingReportViewModel
-    {
-        HCW_Name = f.HCW_Name,
-        DUO = f.DUO,
-        Professional_Category = f.Professional_Category,
-        Fit_Test_Solution = f.Fit_Test_Solution,
-        Test_Results = f.Test_Results, // Now handled by SQL
-        Name_of_Fit_Tester = f.Name_of_Fit_Tester,
-        SubmittedAt = f.SubmittedAt,
-        ExpiringAt = f.ExpiringAt
-    })
-    .ToList();
-
+            // ------------------------------
+            // DUO (Department) Summary
+            // ------------------------------
             var tallyReport = duoList
                 .Select(unit => new
                 {
                     Unit = unit,
-                    TotalFitTested = fitTests.Count(f => f.DUO == unit && f.Test_Results == "Passed"),
-                    Expired = fitTests.Count(f => f.DUO == unit && f.Test_Results == "Passed" && f.ExpiringAt < currentDate)
+                    TotalFitTested = fitTests.Count(f => f.DUO_Tester == unit),
+                    Passed = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Passed"),
+                    Failed = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Failed"),
+                    Expired = fitTests.Count(f => f.DUO_Tester == unit && f.ExpiringAt < currentDate && f.Test_Results == "Passed")
                 })
                 .ToList();
 
-            var tallyMedical = duoMedical
-                .Select(unit => new
+            // ------------------------------
+            // Per DUO_Tester Summary (NEW)
+            // ------------------------------
+            var testerSummary = fitTests
+                .GroupBy(f => f.DUO_Tester)
+                .Select(g => new
                 {
-                    Unit = unit,
-                    TotalFitTested = fitTests.Count(f => f.DUO == unit && f.Test_Results == "Passed"),
-                    Expired = fitTests.Count(f => f.DUO == unit && f.Test_Results == "Passed" && f.ExpiringAt < currentDate)
+                    Tester = g.Key,
+                    Total = g.Count(),
+                    Passed = g.Count(f => f.Test_Results == "Passed"),
+                    Failed = g.Count(f => f.Test_Results == "Failed"),
+                    Expired = g.Count(f => f.ExpiringAt < currentDate && f.Test_Results == "Passed")
                 })
+                .OrderBy(t => t.Tester)
                 .ToList();
 
-            var tallyAllied = duoAllied
-               .Select(unit => new
-               {
-                   Unit = unit,
-                   TotalFitTested = fitTests.Count(f => f.DUO == unit && f.Test_Results == "Passed"),
-                   Expired = fitTests.Count(f => f.DUO == unit && f.Test_Results == "Passed" && f.ExpiringAt < currentDate)
-               })
-               .ToList();
-
-            // Totals for tallyReport
+            // ------------------------------
+            // Totals
+            // ------------------------------
             int totalFitTestedReport = tallyReport.Sum(t => t.TotalFitTested);
             int totalExpiredReport = tallyReport.Sum(t => t.Expired);
+            int totalPassedReport = tallyReport.Sum(t => t.Passed);
+            int totalFailedReport = tallyReport.Sum(t => t.Failed);
 
-            // Totals for tallyMedical
-            int totalFitTestedMedical = tallyMedical.Sum(t => t.TotalFitTested);
-            int totalExpiredMedical = tallyMedical.Sum(t => t.Expired);
+            // Grand totals
+            int grandTotalFitTested = fitTests.Count;
+            int grandTotalPassed = fitTests.Count(f => f.Test_Results == "Passed");
+            int grandTotalFailed = fitTests.Count(f => f.Test_Results == "Failed");
+            int grandTotalExpired = fitTests.Count(f => f.ExpiringAt < currentDate && f.Test_Results == "Passed");
 
-            // Totals for tallyAllied
-            int totalFitTestedAllied = tallyAllied.Sum(t => t.TotalFitTested);
-            int totalExpiredAllied = tallyAllied.Sum(t => t.Expired);
-
-            // Grand Totals (sum of all three)
-            int grandTotalFitTested = totalFitTestedReport + totalFitTestedMedical + totalFitTestedAllied;
-            int grandTotalExpired = totalExpiredReport + totalExpiredMedical + totalExpiredAllied;
-
-            // Pass all lists to the view
+            // ------------------------------
+            // Pass to view
+            // ------------------------------
             ViewBag.AttendanceForPhysicians = attendanceForPhysicians;
             ViewBag.AttendanceForNursingAndAllied = attendanceForNursingAndAllied;
             ViewBag.TallyReport = tallyReport;
-            ViewBag.TallyMedical = tallyMedical;
-            ViewBag.TallyAllied = tallyAllied;
+            ViewBag.TesterSummary = testerSummary;
 
             ViewBag.TotalFitTestedReport = totalFitTestedReport;
             ViewBag.TotalExpiredReport = totalExpiredReport;
-            ViewBag.TotalFitTestedMedical = totalFitTestedMedical;
-            ViewBag.TotalExpiredMedical = totalExpiredMedical;
-            ViewBag.TotalFitTestedAllied = totalFitTestedAllied;
-            ViewBag.TotalExpiredAllied = totalExpiredAllied;
+            ViewBag.TotalPassedReport = totalPassedReport;
+            ViewBag.TotalFailedReport = totalFailedReport;
 
             ViewBag.GrandTotalFitTested = grandTotalFitTested;
+            ViewBag.GrandTotalPassed = grandTotalPassed;
+            ViewBag.GrandTotalFailed = grandTotalFailed;
             ViewBag.GrandTotalExpired = grandTotalExpired;
-
 
             return View();
         }
+
         public IActionResult ExportToExcel()
         {
             var attendanceForPhysicians = _context.FitTestingForm

@@ -19,6 +19,7 @@
             color: #007bff; /* Blue color on hover */
             text-decoration: underline; /* Underline effect on hover */
         }
+
     .custom-heading {
         font-size: 1.25rem; /* Slightly larger font size */
         font-weight: 600; /* Semi-bold font weight */
@@ -27,6 +28,7 @@
         letter-spacing: 1px; /* Add some spacing between letters */
         margin-bottom: 10px; /* Add space below the heading */
     }
+
     body {
         background: linear-gradient(to right, #e9f1f7, #f7f9fb);
         background-attachment: fixed;
@@ -44,6 +46,7 @@
             transform: translateY(-4px);
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
         }
+
     .modal-header {
         background-color: #007bff;
         color: white;
@@ -88,229 +91,239 @@
     }
 </style>
 
-
-
 <div class="border rounded p-4 mb-4 mt-5" style="border: 2px solid #dee2e6; background-color: #ffffff;">
-
     <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded" style="background-color: #f0f4f8;">
         <h4 class="mb-0 custom-heading">Complete Summary of Fit Testing Results</h4>
         <a asp-action="ExportToExcel" class="btn btn-success export-btn">Export to Excel</a>
     </div>
 
-<!-- Button to Trigger Modal for Physicians Table -->
-<div class="row">
-    <!-- Physicians Card -->
-    <div class="col-md-6 mb-4">
-        <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#physiciansModal" style="cursor: pointer;">
-            <div class="card-body text-center">
-                <h5 class="card-title">Attendance for Physicians</h5>
-                <p class="card-text text-muted">View detailed fit testing attendance for physicians.</p>
+    <div class="row">
+        <!-- Physicians Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#physiciansModal" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Attendance for Physicians</h5>
+                    <p class="card-text text-muted">View detailed fit testing attendance for physicians.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-<!-- Modal for Attendance for Physicians -->
-<div class="modal fade" id="physiciansModal" tabindex="-1" aria-labelledby="physiciansModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="physiciansModalLabel">Attendance for Physicians</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-container">
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Department/Unit/Office</th>
-                                <th>Professional Category</th>
-                                <th>Fit Test Solution</th>
-                                <th>Status</th>
-                                <th>Fit Tester</th>
-                                <th>Date Fit Tested</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (attendanceForPhysicians != null)
-                            {
-                                @foreach (var item in attendanceForPhysicians.Take(10))
-                                {
+        <!-- Modal for Attendance for Physicians -->
+        <div class="modal fade" id="physiciansModal" tabindex="-1" aria-labelledby="physiciansModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="physiciansModalLabel">Attendance for Physicians</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-container">
+                            <table class="table table-bordered table-hover">
+                                <thead>
                                     <tr>
-                                        <td>@item.HCW_Name</td>
-                                        <td>@item.DUO</td>
-                                        <td>@item.Professional_Category</td>
-                                        <td>@item.Fit_Test_Solution</td>
-                                        <td>@item.Status</td>
-                                        <td>@item.Name_of_Fit_Tester</td>
-                                        <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
+                                        <th>Name</th>
+                                        <th>Department/Unit/Office</th>
+                                        <th>Professional Category</th>
+                                        <th>Fit Test Solution</th>
+                                        <th>Status</th>
+                                        <th>Fit Tester</th>
+                                        <th>Date Fit Tested</th>
                                     </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                    @if (attendanceForPhysicians != null)
+                                    {
+                                        @foreach (var item in attendanceForPhysicians.Take(10))
+                                        {
+                                            <tr>
+                                                <td>@item.HCW_Name</td>
+                                                <td>@item.DUO</td>
+                                                <td>@item.Professional_Category</td>
+                                                <td>@item.Fit_Test_Solution</td>
+                                                <td>@item.Status</td>
+                                                <td>@item.Name_of_Fit_Tester</td>
+                                                <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+
+        <!-- Button to Trigger Modal for Nursing and Allied Table -->
+        <div class="col-md-6 mb-4">
+            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#nursingAndAlliedModal" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Attendance for Nursing and Allied</h5>
+                    <p class="card-text text-muted">View detailed fit testing attendance for nursing and allied staff.</p>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Button to Trigger Modal for Nursing and Allied Table -->
-    <div class="col-md-6 mb-4">
-        <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#nursingAndAlliedModal" style="cursor: pointer;">
-            <div class="card-body text-center">
-                <h5 class="card-title">Attendance for Nursing and Allied</h5>
-                <p class="card-text text-muted">View detailed fit testing attendance for nursing and allied staff.</p>
+        <!-- Modal for Attendance for Nursing and Allied -->
+        <div class="modal fade" id="nursingAndAlliedModal" tabindex="-1" aria-labelledby="nursingAndAlliedModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="nursingAndAlliedModalLabel">Attendance for Nursing and Allied</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-container">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>HCW Name</th>
+                                        <th>DUO</th>
+                                        <th>Professional Category</th>
+                                        <th>Fit Test Solution</th>
+                                        <th>Status</th>
+                                        <th>Fit Tester</th>
+                                        <th>Date Fit Tested</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ViewBag.AttendanceForNursingAndAllied)
+                                    {
+                                        <tr>
+                                            <td>@item.HCW_Name</td>
+                                            <td>@item.DUO</td>
+                                            <td>@item.Professional_Category</td>
+                                            <td>@item.Fit_Test_Solution</td>
+                                            <td class="@(item.Test_Results == "Expired" ? "text-danger" : "text-success")">
+                                                @item.Test_Results
+                                            </td>
+                                            <td>@item.Name_of_Fit_Tester</td>
+                                            <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-<!-- Modal for Attendance for Nursing and Allied -->
-<div class="modal fade" id="nursingAndAlliedModal" tabindex="-1" aria-labelledby="nursingAndAlliedModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="nursingAndAlliedModalLabel">Attendance for Nursing and Allied</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- DUO Unit Tally Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#duoUnitTallyModal" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">DUO Unit Tally Report</h5>
+                    <p class="card-text text-muted">See total and expired fit tests by department/unit.</p>
+                </div>
             </div>
-            <div class="modal-body">
-                <div class="table-container">
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>HCW Name</th>
-                                <th>DUO</th>
-                                <th>Professional Category</th>
-                                <th>Fit Test Solution</th>
-                                <th>Status</th>
-                                <th>Fit Tester</th>
-                                <th>Date Fit Tested</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in ViewBag.AttendanceForNursingAndAllied)
-                            {
+        </div>
+
+        <!-- DUO Unit Tally Report Modal -->
+        <div class="modal fade" id="duoUnitTallyModal" tabindex="-1" aria-labelledby="duoUnitTallyModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="duoUnitTallyModalLabel">DUO Unit Tally Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-container">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Department / Unit</th>
+                                        <th>Total Fit Tested</th>
+                                        <th>Passed</th>
+                                        <th>Failed</th>
+                                        <th>Expired</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.TallyReport != null)
+                                    {
+                                        foreach (var unit in ViewBag.TallyReport)
+                                        {
+                                            <tr>
+                                                <td>@unit.Unit</td>
+                                                <td>@unit.TotalFitTested</td>
+                                                <td>@unit.Passed</td>
+                                                <td>@unit.Failed</td>
+                                                <td class="@(unit.Expired > 0 ? "text-danger" : "text-success")">@unit.Expired</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr><td colspan="5" class="text-muted">No data available.</td></tr>
+                                    }
+                                </tbody>
+                                <tfoot class="footer-table">
+                                    <tr>
+                                        <th>Total</th>
+                                        <th>@ViewBag.TotalFitTestedReport</th>
+                                        <th>@ViewBag.TotalPassedReport</th>
+                                        <th>@ViewBag.TotalFailedReport</th>
+                                        <th class="@(ViewBag.TotalExpiredReport > 0 ? "text-danger" : "text-success")">@ViewBag.TotalExpiredReport</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Button to Trigger Modal for Grand Total -->
+        <div class="col-md-6 mb-4">
+            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#grandTotalModal" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Grand Total</h5>
+                    <p class="card-text text-muted">View the overall fit testing summary.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Grand Total -->
+        <div class="modal fade" id="grandTotalModal" tabindex="-1" aria-labelledby="grandTotalModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="grandTotalModalLabel">Grand Total</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered grand-total-table">
+                            <thead>
                                 <tr>
-                                    <td>@item.HCW_Name</td>
-                                    <td>@item.DUO</td>
-                                    <td>@item.Professional_Category</td>
-                                    <td>@item.Fit_Test_Solution</td>
-                                    <td class="@(item.Test_Results == "Expired" ? "text-danger" : "text-success")">
-                                        @item.Test_Results
-                                    </td>
-                                    <td>@item.Name_of_Fit_Tester</td>
-                                    <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
+                                    <th>Category</th>
+                                    <th>Total Fit Tested</th>
+                                    <th>Expired</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Button to Trigger Modal for DUO Unit Tally Report -->
-    <div class="col-md-6 mb-4">
-        <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#duoUnitTallyModal" style="cursor: pointer;">
-            <div class="card-body text-center">
-                <h5 class="card-title">DUO Unit Tally Report</h5>
-                <p class="card-text text-muted">See total and expired fit tests by department/unit.</p>
-            </div>
-        </div>
-    </div>
-
-<!-- Modal for DUO Unit Tally Report -->
-<div class="modal fade" id="duoUnitTallyModal" tabindex="-1" aria-labelledby="duoUnitTallyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="duoUnitTallyModalLabel">DUO Unit Tally Report</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-container">
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Unit</th>
-                                <th>Total Fit Tested</th>
-                                <th>Expired</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in ViewBag.TallyReport)
-                            {
+                            </thead>
+                            <tbody>
                                 <tr>
-                                    <td>@item.Unit</td>
-                                    <td>@item.TotalFitTested</td>
-                                    <td>@item.Expired</td>
+                                    <td>Grand Total</td>
+                                    <td>@ViewBag.GrandTotalFitTested</td>
+                                    <td class="@(ViewBag.GrandTotalExpired > 0 ? "text-danger" : "text-success")">@ViewBag.GrandTotalExpired</td>
                                 </tr>
-                            }
-                        </tbody>
-                        <tfoot class="footer-table">
-                            <tr>
-                                <th>Total</th>
-                                <th>@ViewBag.TotalFitTestedReport</th>
-                                <th>@ViewBag.TotalExpiredReport</th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
         </div>
     </div>
 </div>
-
-<!-- Button to Trigger Modal for Grand Total -->
-    <div class="col-md-6 mb-4">
-        <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#grandTotalModal" style="cursor: pointer;">
-            <div class="card-body text-center">
-                <h5 class="card-title">Grand Total</h5>
-                <p class="card-text text-muted">View the overall fit testing summary.</p>
-            </div>
-        </div>
-    </div>
-
-<!-- Modal for Grand Total -->
-<div class="modal fade" id="grandTotalModal" tabindex="-1" aria-labelledby="grandTotalModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="grandTotalModalLabel">Grand Total</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-bordered grand-total-table">
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Total Fit Tested</th>
-                            <th>Expired</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Grand Total</td>
-                            <td>@ViewBag.GrandTotalFitTested</td>
-                            <td>@ViewBag.GrandTotalExpired</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-    </div>
