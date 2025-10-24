@@ -141,7 +141,11 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label asp-for="Model" class="form-label fw-bold">Model</label>
-                                    <input asp-for="Model" class="form-control" placeholder="Enter Model" />
+                                    <select asp-for="Model" class="form-select">
+                                        <option value="">Select Model</option>
+                                        <option value="Flat-Type">Flat-Type</option>
+                                        <option value="Aura">Aura</option>
+                                    </select>
                                     <span asp-validation-for="Model" class="text-danger"></span>
                                 </div>
                             </div>
@@ -182,7 +186,7 @@
                                     <input class="form-check-input" asp-for="Reading" />
                                     <label class="form-check-label">@Html.DisplayNameFor(model => model.Reading)</label>
                                 </div>
-                                <div form-check">
+                                <div class="form-check">
                                     <input class="form-check-input" asp-for="Bending_Jogging" />
                                     <label class="form-check-label">Bending Jogging</label>
                                 </div>
@@ -335,4 +339,3 @@
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-```
