@@ -91,6 +91,7 @@ namespace IPCU.Data
         public DbSet<IPCU.Models.Insertion> Insertion { get; set; } = default!;
         public DbSet<IPCU.Models.TCSkillsChecklistReal> TCSkillsChecklistReal { get; set; } = default!;
         public DbSet<IPCU.Models.PatientHAI> PatientHAI { get; set; }
+        public object FitTestingForms { get; internal set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{
