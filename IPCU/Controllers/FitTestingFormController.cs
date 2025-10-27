@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using IPCU.Data;
+using IPCU.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using IPCU.Data;
-using IPCU.Models;
-using X.PagedList;
-using X.PagedList.Mvc.Core;
-using X.PagedList.Extensions;
-using ClosedXML.Excel;
-using System.IO;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using X.PagedList;
+using X.PagedList.Extensions;
+using X.PagedList.Mvc.Core;
 
 namespace IPCU.Controllers
 {
@@ -428,16 +429,20 @@ namespace IPCU.Controllers
                 .ToList();
 
             // ------------------------------
-            // DUO (Department) Summary
+            // DUO (Department) Summary - UPDATED WITH NEW PROPERTIES
             // ------------------------------
             var tallyReport = duoList
                 .Select(unit => new
                 {
                     Unit = unit,
-                    TotalFitTested = fitTests.Count(f => f.DUO_Tester == unit),
+                    TotalStaff = fitTests.Count(f => f.DUO_Tester == unit), // Total staff in the unit
+                    TotalFitTested = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Passed"),
                     Passed = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Passed"),
                     Failed = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Failed"),
-                    Expired = fitTests.Count(f => f.DUO_Tester == unit && f.ExpiringAt < currentDate && f.Test_Results == "Passed")
+                    NotDone = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results != "Passed" && f.Test_Results != "Failed"), // Not done = neither passed nor failed
+                    Expired = fitTests.Count(f => f.DUO_Tester == unit && f.ExpiringAt < currentDate && f.Test_Results == "Passed"),
+                    ThreeMAura = fitTests.Count(f => f.DUO_Tester == unit && f.Fit_Test_Solution != null && f.Fit_Test_Solution.Contains("3M")), // Count 3M Aura tests
+                    GrandTotal = fitTests.Count(f => f.DUO_Tester == unit) // Grand total = all tests in the unit
                 })
                 .ToList();
 
@@ -458,21 +463,25 @@ namespace IPCU.Controllers
                 .ToList();
 
             // ------------------------------
-            // Totals
+            // Totals - UPDATED WITH NEW TOTALS
             // ------------------------------
             int totalFitTestedReport = tallyReport.Sum(t => t.TotalFitTested);
             int totalExpiredReport = tallyReport.Sum(t => t.Expired);
             int totalPassedReport = tallyReport.Sum(t => t.Passed);
             int totalFailedReport = tallyReport.Sum(t => t.Failed);
+            int totalStaffReport = tallyReport.Sum(t => t.TotalStaff);
+            int totalNotDoneReport = tallyReport.Sum(t => t.NotDone);
+            int totalThreeMAuraReport = tallyReport.Sum(t => t.ThreeMAura);
+            int totalGrandTotalReport = tallyReport.Sum(t => t.GrandTotal);
 
             // Grand totals
-            int grandTotalFitTested = fitTests.Count;
+            int grandTotalFitTested = fitTests.Count(f => f.Test_Results == "Passed");
             int grandTotalPassed = fitTests.Count(f => f.Test_Results == "Passed");
             int grandTotalFailed = fitTests.Count(f => f.Test_Results == "Failed");
             int grandTotalExpired = fitTests.Count(f => f.ExpiringAt < currentDate && f.Test_Results == "Passed");
 
             // ------------------------------
-            // Pass to view
+            // Pass to view - UPDATED WITH NEW VIEWBAG PROPERTIES
             // ------------------------------
             ViewBag.AttendanceForPhysicians = attendanceForPhysicians;
             ViewBag.AttendanceForNursingAndAllied = attendanceForNursingAndAllied;
@@ -483,6 +492,10 @@ namespace IPCU.Controllers
             ViewBag.TotalExpiredReport = totalExpiredReport;
             ViewBag.TotalPassedReport = totalPassedReport;
             ViewBag.TotalFailedReport = totalFailedReport;
+            ViewBag.TotalStaffReport = totalStaffReport;
+            ViewBag.TotalNotDoneReport = totalNotDoneReport;
+            ViewBag.TotalThreeMAuraReport = totalThreeMAuraReport;
+            ViewBag.TotalGrandTotalReport = totalGrandTotalReport;
 
             ViewBag.GrandTotalFitTested = grandTotalFitTested;
             ViewBag.GrandTotalPassed = grandTotalPassed;
@@ -494,22 +507,55 @@ namespace IPCU.Controllers
 
         public IActionResult ExportToExcel()
         {
-            var attendanceForPhysicians = _context.FitTestingForm
-                .Where(f => f.Test_Results == "Passed")
+            var physicianCategories = new List<string>
+    {
+        "Consultant - Plantilla", "Physician - Plantilla", "Resident - Plantilla",
+        "Fellows - Plantilla", "Consultant-Active Non-Plantilla", "Resident - Plantilla Second Year",
+        "Resident - Plantilla First Year", "Resident - Third Year - Plantilla",
+        "Resident - Second Year - Plantilla", "Resident - First Year - Plantilla",
+        "Plantilla - MS II", "Plantilla - DM III", "Plantilla - MS I",
+        "Plantilla - DED IV", "Plantilla - MS III", "Fellow Plantilla - 1st Year",
+        "Fellow Plantilla - 2nd Year", "Active Non-Plantilla", "Fellow - 3rd Year",
+        "Fellow - 2nd Year", "Fellow - 1st Year", "Medical Officer III", "Fellow",
+        "Resident", "Consultants - Plantilla", "Visiting Consultant", "Consultant",
+        "Consultant - Non-Plantilla", "MO III"
+    };
+
+            var duoList = new List<string>
+    {
+        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
+        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
+        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
+        "iVASC", "OPS", "AITU", "PCU", "IPCU"
+    };
+
+            var fitTests = _context.FitTestingForm.ToList();
+            var currentDate = DateTime.Now;
+
+            // Get data using the same logic as Reports method
+            var attendanceForPhysicians = fitTests
+                .Where(f => physicianCategories.Contains(f.Professional_Category) && f.Test_Results == "Passed")
                 .ToList();
 
-            var attendanceForNursingAndAllied = _context.FitTestingForm
-                .Where(f => f.Test_Results == "Passed")
+            var attendanceForNursingAndAllied = fitTests
+                .Where(f => !physicianCategories.Contains(f.Professional_Category) && f.Test_Results == "Passed")
                 .ToList();
 
-            var tallyReport = _context.FitTestingForm
-                .GroupBy(f => f.DUO)
-                .Select(g => new
+            // Updated tally report with ALL columns matching the web view
+            var tallyReport = duoList
+                .Select(unit => new
                 {
-                    Unit = g.Key,
-                    TotalFitTested = g.Count(f => f.Test_Results == "Passed"),
-                    Expired = g.Count(f => f.ExpiringAt < DateTime.Now && f.Test_Results == "Passed")
-                }).ToList();
+                    Unit = unit,
+                    TotalStaff = fitTests.Count(f => f.DUO_Tester == unit),
+                    TotalFitTested = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Passed"),
+                    Passed = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Passed"),
+                    Failed = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results == "Failed"),
+                    NotDone = fitTests.Count(f => f.DUO_Tester == unit && f.Test_Results != "Passed" && f.Test_Results != "Failed"),
+                    Expired = fitTests.Count(f => f.DUO_Tester == unit && f.ExpiringAt < currentDate && f.Test_Results == "Passed"),
+                    ThreeMAura = fitTests.Count(f => f.DUO_Tester == unit && f.Fit_Test_Solution != null && f.Fit_Test_Solution.Contains("3M")),
+                    GrandTotal = fitTests.Count(f => f.DUO_Tester == unit)
+                })
+                .ToList();
 
             using (var workbook = new XLWorkbook())
             {
@@ -521,6 +567,7 @@ namespace IPCU.Controllers
                     sheet.Columns(1, columnCount).AdjustToContents();
                 }
 
+                // Physicians Worksheet
                 var worksheet1 = workbook.Worksheets.Add("Physicians");
                 worksheet1.Cell(1, 1).Value = "Name";
                 worksheet1.Cell(1, 2).Value = "Department/Unit/Office";
@@ -544,6 +591,7 @@ namespace IPCU.Controllers
                     row++;
                 }
 
+                // Nursing & Allied Worksheet
                 var worksheet2 = workbook.Worksheets.Add("Nursing & Allied");
                 worksheet2.Cell(1, 1).Value = "Name";
                 worksheet2.Cell(1, 2).Value = "Department/Unit/Office";
@@ -567,38 +615,62 @@ namespace IPCU.Controllers
                     row++;
                 }
 
-                var worksheet3 = workbook.Worksheets.Add("Tally Report");
-                worksheet3.Cell(1, 1).Value = "Unit";
-                worksheet3.Cell(1, 2).Value = "Total Fit Tested";
-                worksheet3.Cell(1, 3).Value = "Expired";
-                FormatHeaders(worksheet3, 3);
+                // COMPLETE Tally Report Worksheet with ALL columns
+                var worksheet3 = workbook.Worksheets.Add("DUO Unit Tally Report");
+                worksheet3.Cell(1, 1).Value = "Department / Unit";
+                worksheet3.Cell(1, 2).Value = "Total Staff";
+                worksheet3.Cell(1, 3).Value = "Total Fit Tested";
+                worksheet3.Cell(1, 4).Value = "Passed";
+                worksheet3.Cell(1, 5).Value = "Failed";
+                worksheet3.Cell(1, 6).Value = "Not Done";
+                worksheet3.Cell(1, 7).Value = "Expired";
+                worksheet3.Cell(1, 8).Value = "Rate (%)";
+                worksheet3.Cell(1, 9).Value = "3M Aura";
+                worksheet3.Cell(1, 10).Value = "Grand Total";
+                FormatHeaders(worksheet3, 10);
 
                 row = 2;
                 foreach (var item in tallyReport)
                 {
+                    // Calculate rate percentage
+                    var rate = item.TotalStaff > 0 ? (item.TotalFitTested * 100.0 / item.TotalStaff) : 0;
+
                     worksheet3.Cell(row, 1).Value = item.Unit;
-                    worksheet3.Cell(row, 2).Value = item.TotalFitTested;
-                    worksheet3.Cell(row, 3).Value = item.Expired;
+                    worksheet3.Cell(row, 2).Value = item.TotalStaff;
+                    worksheet3.Cell(row, 3).Value = item.TotalFitTested;
+                    worksheet3.Cell(row, 4).Value = item.Passed;
+                    worksheet3.Cell(row, 5).Value = item.Failed;
+                    worksheet3.Cell(row, 6).Value = item.NotDone;
+                    worksheet3.Cell(row, 7).Value = item.Expired;
+                    worksheet3.Cell(row, 8).Value = Math.Round(rate, 1);
+                    worksheet3.Cell(row, 9).Value = item.ThreeMAura;
+                    worksheet3.Cell(row, 10).Value = item.GrandTotal;
                     row++;
                 }
 
-                var summarySheet = workbook.Worksheets.Add("Summary");
-                summarySheet.Cell(1, 1).Value = "Category";
-                summarySheet.Cell(1, 2).Value = "Total Fit Tested";
-                summarySheet.Cell(1, 3).Value = "Expired";
-                FormatHeaders(summarySheet, 3);
+                // Add totals row to Tally Report
+                var totalRow = row;
+                worksheet3.Cell(totalRow, 1).Value = "TOTAL";
+                worksheet3.Cell(totalRow, 2).Value = tallyReport.Sum(t => t.TotalStaff);
+                worksheet3.Cell(totalRow, 3).Value = tallyReport.Sum(t => t.TotalFitTested);
+                worksheet3.Cell(totalRow, 4).Value = tallyReport.Sum(t => t.Passed);
+                worksheet3.Cell(totalRow, 5).Value = tallyReport.Sum(t => t.Failed);
+                worksheet3.Cell(totalRow, 6).Value = tallyReport.Sum(t => t.NotDone);
+                worksheet3.Cell(totalRow, 7).Value = tallyReport.Sum(t => t.Expired);
 
-                summarySheet.Cell(2, 1).Value = "Physicians";
-                summarySheet.Cell(2, 2).Value = attendanceForPhysicians.Count;
-                summarySheet.Cell(2, 3).Value = attendanceForPhysicians.Count(f => f.ExpiringAt < DateTime.Now);
+                // Calculate overall rate
+                var totalStaff = tallyReport.Sum(t => t.TotalStaff);
+                var totalFitTested = tallyReport.Sum(t => t.TotalFitTested);
+                var overallRate = totalStaff > 0 ? (totalFitTested * 100.0 / totalStaff) : 0;
+                worksheet3.Cell(totalRow, 8).Value = Math.Round(overallRate, 1);
 
-                summarySheet.Cell(3, 1).Value = "Nursing & Allied";
-                summarySheet.Cell(3, 2).Value = attendanceForNursingAndAllied.Count;
-                summarySheet.Cell(3, 3).Value = attendanceForNursingAndAllied.Count(f => f.ExpiringAt < DateTime.Now);
+                worksheet3.Cell(totalRow, 9).Value = tallyReport.Sum(t => t.ThreeMAura);
+                worksheet3.Cell(totalRow, 10).Value = tallyReport.Sum(t => t.GrandTotal);
 
-                summarySheet.Cell(4, 1).Value = "Grand Total";
-                summarySheet.Cell(4, 2).FormulaA1 = "=B2+B3";
-                summarySheet.Cell(4, 3).FormulaA1 = "=C2+C3";
+                // Format total row
+                var totalRange = worksheet3.Range(totalRow, 1, totalRow, 10);
+                totalRange.Style.Font.Bold = true;
+                totalRange.Style.Fill.BackgroundColor = XLColor.LightGray;
 
                 using (var stream = new MemoryStream())
                 {
@@ -608,7 +680,6 @@ namespace IPCU.Controllers
                 }
             }
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetEmployeeDetails(string employeeId)
