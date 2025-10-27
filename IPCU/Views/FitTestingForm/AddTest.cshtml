@@ -3,14 +3,24 @@
     ViewData["Title"] = "Add Fit Test";
 }
 
-<h2>Add Test</h2>
+<!-- In your HTML head -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Before closing body tag -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<h2>Add Fit Test</h2>
 
 <form id="testForm" asp-action="AddTest" method="post">
     <input type="hidden" asp-for="FitTestingFormId" />
+    <!-- Validation alert container -->
+    <div id="validationAlert" class="alert alert-warning d-none" role="alert"></div>
     <table class="table">
         <thead>
             <tr>
                 <th>Question</th>
+                <button type="button" id="backButton" class="btn btn-secondary me-2">Back</button>
                 <th>Score/Result</th>
             </tr>
         </thead>
@@ -23,7 +33,7 @@
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="Normal_Breathing" id="NormalBreathingCheck" value="true" />
                                 <label class="btn btn-outline-success" for="NormalBreathingCheck">✓</label>
-                                <input type="radio" class="btn-check" name="Normal_Breathing" id="NormalBreathingCross" value="false" checked />
+                                <input type="radio" class="btn-check" name="Normal_Breathing" id="NormalBreathingCross" value="false" />
                                 <label class="btn btn-outline-danger" for="NormalBreathingCross">✘</label>
                             </div>
                         </div>
@@ -32,7 +42,7 @@
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="Normal_Breathing_2" id="NormalBreathing2Check" value="true" />
                                 <label class="btn btn-outline-success" for="NormalBreathing2Check">✓</label>
-                                <input type="radio" class="btn-check" name="Normal_Breathing_2" id="NormalBreathing2Cross" value="false" checked />
+                                <input type="radio" class="btn-check" name="Normal_Breathing_2" id="NormalBreathing2Cross" value="false" />
                                 <label class="btn btn-outline-danger" for="NormalBreathing2Cross">✘</label>
                             </div>
                         </div>
@@ -41,7 +51,7 @@
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="Deep_Breathing" id="DeepBreathingCheck" value="true" />
                                 <label class="btn btn-outline-success" for="DeepBreathingCheck">✓</label>
-                                <input type="radio" class="btn-check" name="Deep_Breathing" id="DeepBreathingCross" value="false" checked />
+                                <input type="radio" class="btn-check" name="Deep_Breathing" id="DeepBreathingCross" value="false" />
                                 <label class="btn btn-outline-danger" for="DeepBreathingCross">✘</label>
                             </div>
                         </div>
@@ -50,7 +60,7 @@
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="Turn_head_side_to_side" id="TurnHeadCheck" value="true" />
                                 <label class="btn btn-outline-success" for="TurnHeadCheck">✓</label>
-                                <input type="radio" class="btn-check" name="Turn_head_side_to_side" id="TurnHeadCross" value="false" checked />
+                                <input type="radio" class="btn-check" name="Turn_head_side_to_side" id="TurnHeadCross" value="false" />
                                 <label class="btn btn-outline-danger" for="TurnHeadCross">✘</label>
                             </div>
                         </div>
@@ -59,7 +69,7 @@
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="Move_head_up_and_down" id="MoveHeadCheck" value="true" />
                                 <label class="btn btn-outline-success" for="MoveHeadCheck">✓</label>
-                                <input type="radio" class="btn-check" name="Move_head_up_and_down" id="MoveHeadCross" value="false" checked />
+                                <input type="radio" class="btn-check" name="Move_head_up_and_down" id="MoveHeadCross" value="false" />
                                 <label class="btn btn-outline-danger" for="MoveHeadCross">✘</label>
                             </div>
                         </div>
@@ -68,7 +78,7 @@
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="Reading" id="ReadingCheck" value="true" />
                                 <label class="btn btn-outline-success" for="ReadingCheck">✓</label>
-                                <input type="radio" class="btn-check" name="Reading" id="ReadingCross" value="false" checked />
+                                <input type="radio" class="btn-check" name="Reading" id="ReadingCross" value="false" />
                                 <label class="btn btn-outline-danger" for="ReadingCross">✘</label>
                             </div>
                         </div>
@@ -77,7 +87,7 @@
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="Bending_Jogging" id="BendingJoggingCheck" value="true" />
                                 <label class="btn btn-outline-success" for="BendingJoggingCheck">✓</label>
-                                <input type="radio" class="btn-check" name="Bending_Jogging" id="BendingJoggingCross" value="false" checked />
+                                <input type="radio" class="btn-check" name="Bending_Jogging" id="BendingJoggingCross" value="false" />
                                 <label class="btn btn-outline-danger" for="BendingJoggingCross">✘</label>
                             </div>
                         </div>
@@ -86,7 +96,7 @@
                 <td rowspan="2" id="testResult">
                     <div id="resultList" class="d-flex flex-column gap-2"></div>
                     <input type="hidden" asp-for="Test_Results" id="testResultsInput" />
-                    <button type="button" id="retakeButton" class="btn btn-secondary mt-2" style="display: none;">Retake</button>
+                    <button type="button" id="retakeButton" class="btn btn-warning mt-2" style="display: none;">Retake</button>
                 </td>
             </tr>
             <tr>
@@ -95,26 +105,28 @@
         </tbody>
     </table>
 
-
-
-    <button type="button" id="submitTestButton" class="btn btn-primary">Submit Test</button>
-    <button type="submit" class="btn btn-success">Submit Form</button>
+    <div class="mt-3">
+       
+        <button type="button" id="submitTestButton" class="btn btn-primary me-2">Submit Test</button>
+        <button type="submit" class="btn btn-success">Submit Form</button>
+    </div>
 </form>
 
 @section Scripts {
     <script>
         // Array to store test results
         let testResults = [];
+        const maxAttempts = 3;
 
         function updateResult() {
-            // Get the value of each test input
-            const normalBreathing = document.querySelector('input[name="Normal_Breathing"]:checked').value === 'true';
-            const normalBreathing2 = document.querySelector('input[name="Normal_Breathing_2"]:checked').value === 'true';
-            const deepBreathing = document.querySelector('input[name="Deep_Breathing"]:checked').value === 'true';
-            const turnHead = document.querySelector('input[name="Turn_head_side_to_side"]:checked').value === 'true';
-            const moveHead = document.querySelector('input[name="Move_head_up_and_down"]:checked').value === 'true';
-            const reading = document.querySelector('input[name="Reading"]:checked').value === 'true';
-            const bendingJogging = document.querySelector('input[name="Bending_Jogging"]:checked').value === 'true';
+            // Get the value of each test input, default to false if not selected
+            const normalBreathing = document.querySelector('input[name="Normal_Breathing"]:checked')?.value === 'true';
+            const normalBreathing2 = document.querySelector('input[name="Normal_Breathing_2"]:checked')?.value === 'true';
+            const deepBreathing = document.querySelector('input[name="Deep_Breathing"]:checked')?.value === 'true';
+            const turnHead = document.querySelector('input[name="Turn_head_side_to_side"]:checked')?.value === 'true';
+            const moveHead = document.querySelector('input[name="Move_head_up_and_down"]:checked')?.value === 'true';
+            const reading = document.querySelector('input[name="Reading"]:checked')?.value === 'true';
+            const bendingJogging = document.querySelector('input[name="Bending_Jogging"]:checked')?.value === 'true';
 
             // Check if all tests are true (checked ✓)
             return normalBreathing && normalBreathing2 && deepBreathing && turnHead && moveHead && reading && bendingJogging
@@ -122,36 +134,59 @@
                 : 'Failed';
         }
 
+        function showValidationAlert(message) {
+            const validationAlert = document.getElementById('validationAlert');
+            validationAlert.textContent = message;
+            validationAlert.classList.remove('d-none');
+            // Hide alert after 3 seconds
+            setTimeout(() => {
+                validationAlert.classList.add('d-none');
+            }, 3000);
+        }
+
         function displayResults() {
             const resultList = document.getElementById('resultList');
             resultList.innerHTML = ''; // Clear previous display
             testResults.forEach((result, index) => {
                 const resultDiv = document.createElement('div');
-                resultDiv.textContent = `Attempt ${index + 1}: ${result}`;
-                resultDiv.className = result === 'Passed' ? 'text-success' : 'text-danger';
+                resultDiv.className = `alert ${result === 'Passed' ? 'alert-success' : 'alert-danger'} d-flex align-items-center justify-content-between mb-2 p-3 rounded-3 shadow-sm`;
+                resultDiv.innerHTML = `
+                    <div>
+                        <i class="${result === 'Passed' ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'} me-2"></i>
+                        <strong>Attempt ${index + 1}:</strong> ${result}
+                    </div>
+                   
+                `;
                 resultList.appendChild(resultDiv);
             });
             document.getElementById('testResultsInput').value = testResults[testResults.length - 1] || '';
-            // Show retake button only if fewer than 3 attempts and last result is not 'Passed'
-            const retakeButton = document.getElementById('retakeButton');
-            retakeButton.style.display = (testResults.length < 3 && testResults[testResults.length - 1] !== 'Passed') ? 'block' : 'none';
+            document.getElementById('retakeButton').style.display = testResults.length > 0 ? 'block' : 'none';
+
+            // Disable Submit Test button and show validation alert if max attempts reached
+            if (testResults.length >= maxAttempts) {
+                document.getElementById('submitTestButton').disabled = true;
+                document.getElementById('submitTestButton').classList.add('btn-secondary');
+                document.getElementById('submitTestButton').classList.remove('btn-primary');
+                showValidationAlert('Only three attempts allowed.');
+            }
         }
 
         function resetForm() {
-            const radioButtons = document.querySelectorAll('input[type="radio"][value="false"]');
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
             radioButtons.forEach(button => {
-                button.checked = true;
+                button.checked = false;
             });
         }
 
         // Submit Test button handler
         document.getElementById('submitTestButton').addEventListener('click', () => {
-            // Only process if fewer than 3 attempts or last result is not 'Passed'
-            if (testResults.length < 3 && (testResults.length === 0 || testResults[testResults.length - 1] !== 'Passed')) {
+            if (testResults.length < maxAttempts) {
                 const result = updateResult();
                 testResults.push(result);
                 displayResults();
-                resetForm(); // Reset after displaying result
+                // Do not reset form here; only reset on Retake button
+            } else {
+                showValidationAlert('Only three attempts allowed.');
             }
         });
 
@@ -160,7 +195,11 @@
             resetForm();
         });
 
-        // Initialize on page load
-        resetForm();
+        // Back button handler
+        document.getElementById('backButton').addEventListener('click', () => {
+            window.history.back();
+        });
+
+        // No initialization of resetForm on page load
     </script>
 }
