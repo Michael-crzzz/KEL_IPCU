@@ -215,7 +215,7 @@ namespace IPCU.Controllers
         [HttpGet]
         public async Task<IActionResult> AddTest(int id)
         {
-            var form = await _context.FitTestingForm.FindAsync(id); // ✅ Works if _context is ApplicationDbContext
+            var form = await _context.FitTestingForm.FindAsync(id);
             if (form == null)
                 return NotFound();
 
@@ -227,6 +227,40 @@ namespace IPCU.Controllers
             return View("AddTest", model);
         }
 
+        [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> AddTest(FitTestingFormHistory model)
+{
+    if (!ModelState.IsValid)
+    {
+        return View("AddTest", model);
+    }
+
+    // Set SubmittedAt since it's immutable
+    var history = new FitTestingFormHistory
+    {
+        FitTestingFormId = model.FitTestingFormId,
+        Fit_Test_Solution = model.Fit_Test_Solution,
+        Sensitivity_Test = model.Sensitivity_Test,
+        Respiratory_Type = model.Respiratory_Type,
+        Model = model.Model,
+        Size = model.Size,
+        Normal_Breathing = model.Normal_Breathing,
+        Deep_Breathing = model.Deep_Breathing,
+        Turn_head_side_to_side = model.Turn_head_side_to_side,
+        Move_head_up_and_down = model.Move_head_up_and_down,
+        Reading = model.Reading,
+        Bending_Jogging = model.Bending_Jogging,
+        Normal_Breathing_2 = model.Normal_Breathing_2,
+        Test_Results = model.Test_Results,
+        SubmittedAt = DateTime.UtcNow // Set timestamp
+    };
+
+    _context.FitTestingFormHistory.Add(history);
+    await _context.SaveChangesAsync();
+
+    return RedirectToAction("Index"); // Adjust to your desired redirect
+}
 
 
 

@@ -3,90 +3,164 @@
     ViewData["Title"] = "Add Fit Test";
 }
 
-<h2>Add Fit Test</h2>
+<h2>Add Test</h2>
 
-<form asp-action="AddTest" method="post">
-    <input type="hidden" asp-for="FitTestingFormId" value="@Model.FitTestingFormId" />
-
-
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Take Test</h5>
-        </div>
-
-
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Hand Hygiene Activities</h5>
-            </div>
-            
-                    
-
-                        <!-- Before Hand Type Toggle -->
-                        <div class="btn-group mb-3 w-100" role="group" aria-label="Before hand hygiene type">
-                            <input type="radio" class="btn-check" name="beforeHandType" id="beforeHandRubToggle" autocomplete="off" checked>
-                            <label class="btn btn-outline-primary" for="beforeHandRubToggle">Hand Rub</label>
-
-                            <input type="radio" class="btn-check" name="beforeHandType" id="beforeHandWashToggle" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="beforeHandWashToggle">Hand Wash</label>
+<form id="testForm" asp-action="AddTest" method="post">
+    <input type="hidden" asp-for="FitTestingFormId" />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Score/Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="border p-2 rounded d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">Normal Breathing</div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Normal_Breathing" id="NormalBreathingCheck" value="true" />
+                                <label class="btn btn-outline-success" for="NormalBreathingCheck">✓</label>
+                                <input type="radio" class="btn-check" name="Normal_Breathing" id="NormalBreathingCross" value="false" checked />
+                                <label class="btn btn-outline-danger" for="NormalBreathingCross">✘</label>
+                            </div>
                         </div>
-                     
-                       
-                            
+                        <div class="border p-2 rounded d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">Normal Breathing 2</div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Normal_Breathing_2" id="NormalBreathing2Check" value="true" />
+                                <label class="btn btn-outline-success" for="NormalBreathing2Check">✓</label>
+                                <input type="radio" class="btn-check" name="Normal_Breathing_2" id="NormalBreathing2Cross" value="false" checked />
+                                <label class="btn btn-outline-danger" for="NormalBreathing2Cross">✘</label>
+                            </div>
+                        </div>
+                        <div class="border p-2 rounded d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">Deep Breathing</div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Deep_Breathing" id="DeepBreathingCheck" value="true" />
+                                <label class="btn btn-outline-success" for="DeepBreathingCheck">✓</label>
+                                <input type="radio" class="btn-check" name="Deep_Breathing" id="DeepBreathingCross" value="false" checked />
+                                <label class="btn btn-outline-danger" for="DeepBreathingCross">✘</label>
+                            </div>
+                        </div>
+                        <div class="border p-2 rounded d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">Turn Head Side to Side</div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Turn_head_side_to_side" id="TurnHeadCheck" value="true" />
+                                <label class="btn btn-outline-success" for="TurnHeadCheck">✓</label>
+                                <input type="radio" class="btn-check" name="Turn_head_side_to_side" id="TurnHeadCross" value="false" checked />
+                                <label class="btn btn-outline-danger" for="TurnHeadCross">✘</label>
+                            </div>
+                        </div>
+                        <div class="border p-2 rounded d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">Move Head Up and Down</div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Move_head_up_and_down" id="MoveHeadCheck" value="true" />
+                                <label class="btn btn-outline-success" for="MoveHeadCheck">✓</label>
+                                <input type="radio" class="btn-check" name="Move_head_up_and_down" id="MoveHeadCross" value="false" checked />
+                                <label class="btn btn-outline-danger" for="MoveHeadCross">✘</label>
+                            </div>
+                        </div>
+                        <div class="border p-2 rounded d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">Reading</div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Reading" id="ReadingCheck" value="true" />
+                                <label class="btn btn-outline-success" for="ReadingCheck">✓</label>
+                                <input type="radio" class="btn-check" name="Reading" id="ReadingCross" value="false" checked />
+                                <label class="btn btn-outline-danger" for="ReadingCross">✘</label>
+                            </div>
+                        </div>
+                        <div class="border p-2 rounded d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">Bending/Jogging</div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Bending_Jogging" id="BendingJoggingCheck" value="true" />
+                                <label class="btn btn-outline-success" for="BendingJoggingCheck">✓</label>
+                                <input type="radio" class="btn-check" name="Bending_Jogging" id="BendingJoggingCross" value="false" checked />
+                                <label class="btn btn-outline-danger" for="BendingJoggingCross">✘</label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td rowspan="2" id="testResult">
+                    <div id="resultList" class="d-flex flex-column gap-2"></div>
+                    <input type="hidden" asp-for="Test_Results" id="testResultsInput" />
+                    <button type="button" id="retakeButton" class="btn btn-secondary mt-2" style="display: none;">Retake</button>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
 
-                            <div class="d-flex flex-column gap-3 mt-2">
-                                <div class="border p-2 rounded">
-                                    <div class="fw-bold mb-1">1. Before touching a patient</div>
-                                    <div class="btn-group" role="group">
-                                        <input type="radio" class="btn-check" name="BeforeHandRub1Symbol" id="BeforeHandRub1Check" value="1">
-                                        <label class="btn btn-outline-success" for="BeforeHandRub1Check">✓</label>
-
-                                        <input type="radio" class="btn-check" name="BeforeHandRub1Symbol" id="BeforeHandRub1Cross" value="0">
-                                        <label class="btn btn-outline-danger" for="BeforeHandRub1Cross">X</label>
-                                </div>
-                                <div>
-
-                                    <div class="border p-2 rounded">
-                                        <div class="fw-bold mb-1">2. Before clean/aseptic procedure</div>
-                                        <div class="btn-group" role="group">
-                                            <input type="radio" class="btn-check" name="BeforeHandRub2Symbol" id="BeforeHandRub2Check" value="1">
-                                            <label class="btn btn-outline-success" for="BeforeHandRub2Check">✓</label>
-
-                                            <input type="radio" class="btn-check" name="BeforeHandRub2Symbol" id="BeforeHandRub2Cross" value="0">
-                                            <label class="btn btn-outline-danger" for="BeforeHandRub2Cross">X</label>
-
-                                            <input type="radio" class="btn-check" name="BeforeHandRub2Symbol" id="BeforeHandRub2None" value="" checked>
-                                            <label class="btn btn-outline-secondary" for="BeforeHandRub2None">None</label>
-                                        </div>
 
 
-                                        
-                                    </div>
-                                </div>
-                      
-                                    </div>
-                                </div>
-
-
-    <button type="submit" class="btn btn-primary mt-3">Submit Test</button>
+    <button type="button" id="submitTestButton" class="btn btn-primary">Submit Test</button>
+    <button type="submit" class="btn btn-success">Submit Form</button>
 </form>
 
-@if (ViewBag.Result != null)
-{
-    <div class="mt-4 p-3 border rounded text-center">
-        <h4>Test Result:</h4>
-        @if (ViewBag.Result == "Passed")
-        {
-            <span class="text-success fw-bold">PASSED ✅</span>
-        }
-        else
-        {
-            <span class="text-danger fw-bold">FAILED ❌</span>
+@section Scripts {
+    <script>
+        // Array to store test results
+        let testResults = [];
 
-            <form asp-action="AddTest" method="get" class="mt-3">
-                <input type="hidden" name="id" value="@Model.FitTestingFormId" />
-                <button type="submit" class="btn btn-warning">Retake Test</button>
-            </form>
+        function updateResult() {
+            // Get the value of each test input
+            const normalBreathing = document.querySelector('input[name="Normal_Breathing"]:checked').value === 'true';
+            const normalBreathing2 = document.querySelector('input[name="Normal_Breathing_2"]:checked').value === 'true';
+            const deepBreathing = document.querySelector('input[name="Deep_Breathing"]:checked').value === 'true';
+            const turnHead = document.querySelector('input[name="Turn_head_side_to_side"]:checked').value === 'true';
+            const moveHead = document.querySelector('input[name="Move_head_up_and_down"]:checked').value === 'true';
+            const reading = document.querySelector('input[name="Reading"]:checked').value === 'true';
+            const bendingJogging = document.querySelector('input[name="Bending_Jogging"]:checked').value === 'true';
+
+            // Check if all tests are true (checked ✓)
+            return normalBreathing && normalBreathing2 && deepBreathing && turnHead && moveHead && reading && bendingJogging
+                ? 'Passed'
+                : 'Failed';
         }
-    </div>
+
+        function displayResults() {
+            const resultList = document.getElementById('resultList');
+            resultList.innerHTML = ''; // Clear previous display
+            testResults.forEach((result, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.textContent = `Attempt ${index + 1}: ${result}`;
+                resultDiv.className = result === 'Passed' ? 'text-success' : 'text-danger';
+                resultList.appendChild(resultDiv);
+            });
+            document.getElementById('testResultsInput').value = testResults[testResults.length - 1] || '';
+            // Show retake button only if fewer than 3 attempts and last result is not 'Passed'
+            const retakeButton = document.getElementById('retakeButton');
+            retakeButton.style.display = (testResults.length < 3 && testResults[testResults.length - 1] !== 'Passed') ? 'block' : 'none';
+        }
+
+        function resetForm() {
+            const radioButtons = document.querySelectorAll('input[type="radio"][value="false"]');
+            radioButtons.forEach(button => {
+                button.checked = true;
+            });
+        }
+
+        // Submit Test button handler
+        document.getElementById('submitTestButton').addEventListener('click', () => {
+            // Only process if fewer than 3 attempts or last result is not 'Passed'
+            if (testResults.length < 3 && (testResults.length === 0 || testResults[testResults.length - 1] !== 'Passed')) {
+                const result = updateResult();
+                testResults.push(result);
+                displayResults();
+                resetForm(); // Reset after displaying result
+            }
+        });
+
+        // Retake button handler
+        document.getElementById('retakeButton').addEventListener('click', () => {
+            resetForm();
+        });
+
+        // Initialize on page load
+        resetForm();
+    </script>
 }
