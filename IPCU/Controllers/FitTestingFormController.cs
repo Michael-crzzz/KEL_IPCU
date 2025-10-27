@@ -186,7 +186,7 @@ namespace IPCU.Controllers
                     _context.FitTestingFormHistory.Add(history);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("AddTest", "FitTestingForm", new { id = fitTestingForm.Id });
                 }
             }
             catch (Exception ex)
@@ -205,6 +205,29 @@ namespace IPCU.Controllers
 
             return View(fitTestingForm);
         }
+
+
+        // =====================================================
+        // STEP 2: ADD TEST PAGE
+        // =====================================================
+
+        // Show the Add Test page
+        [HttpGet]
+        public async Task<IActionResult> AddTest(int id)
+        {
+            var form = await _context.FitTestingForm.FindAsync(id); // ✅ Works if _context is ApplicationDbContext
+            if (form == null)
+                return NotFound();
+
+            var model = new FitTestingFormHistory
+            {
+                FitTestingFormId = form.Id
+            };
+
+            return View("AddTest", model);
+        }
+
+
 
 
 
