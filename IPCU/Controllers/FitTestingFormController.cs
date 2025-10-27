@@ -224,6 +224,14 @@ namespace IPCU.Controllers
                 FitTestingFormId = form.Id
             };
 
+            // Load history of attempts for this form
+            var history = await _context.FitTestingFormHistory
+                .Where(h => h.FitTestingFormId == id)
+                .OrderBy(h => h.SubmittedAt)
+                .ToListAsync();
+
+            ViewData["TestHistory"] = history;
+
             return View("AddTest", model);
         }
 
