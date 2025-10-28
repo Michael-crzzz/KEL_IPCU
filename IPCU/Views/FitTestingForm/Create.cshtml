@@ -160,47 +160,7 @@
                             <span asp-validation-for="Size" class="text-danger"></span>
                         </div>
 
-                        <h5 class="fw-bold mt-3">Breathing & Movement Tests</h5>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="Normal_Breathing" />
-                                    <label class="form-check-label">Normal Breathing</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="Deep_Breathing" />
-                                    <label class="form-check-label">Deep Breathing</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="Turn_head_side_to_side" />
-                                    <label class="form-check-label">Turn Head side to side</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="Move_head_up_and_down" />
-                                    <label class="form-check-label">Move Head up and down</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="Reading" />
-                                    <label class="form-check-label">@Html.DisplayNameFor(model => model.Reading)</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="Bending_Jogging" />
-                                    <label class="form-check-label">Bending Jogging</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="Normal_Breathing_2" />
-                                    <label class="form-check-label">2nd Normal Breathing</label>
-                                </div>
-                            </div>
-                        </div>
+                        
 
                         <!-- Fit Tester Dropdown -->
                         <div class="mb-3 mt-3">
@@ -227,7 +187,9 @@
 
                         <div class="d-flex justify-content-between">
                             <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back</a>
-                            <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> Submit</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Next Form
+                            </button>
                         </div>
                     </form>
                 </div>

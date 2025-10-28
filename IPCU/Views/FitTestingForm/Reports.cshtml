@@ -3,30 +3,31 @@
     var attendanceForPhysicians = ViewBag.AttendanceForPhysicians as List<IPCU.Models.FitTestingForm>;
     var attendanceForNursingAndAllied = ViewBag.AttendanceForNursingAndAllied as List<IPCU.Models.FitTestingForm>;
 }
+
 <style>
     .card-title {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
-        font-size: 1.5rem; /* Larger font size */
-        font-weight: 500; /* Semi-bold font weight */
-        color: #343a40; /* Dark text color for better readability */
-        letter-spacing: 0.5px; /* Slight letter spacing */
-        line-height: 1.4; /* Increase line height for better spacing between lines */
-        text-transform: capitalize; /* Capitalize the first letter of each word */
-        margin-bottom: 10px; /* Add space below the title */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #343a40;
+        letter-spacing: 0.5px;
+        line-height: 1.4;
+        text-transform: capitalize;
+        margin-bottom: 10px;
     }
 
         .card-title:hover {
-            color: #007bff; /* Blue color on hover */
-            text-decoration: underline; /* Underline effect on hover */
+            color: #007bff;
+            text-decoration: underline;
         }
 
     .custom-heading {
-        font-size: 1.25rem; /* Slightly larger font size */
-        font-weight: 600; /* Semi-bold font weight */
-        color: #007bff; /* Default blue color */
-        text-transform: uppercase; /* Uppercase text */
-        letter-spacing: 1px; /* Add some spacing between letters */
-        margin-bottom: 10px; /* Add space below the heading */
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #007bff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
     }
 
     body {
@@ -89,6 +90,68 @@
     .table-hover tbody tr:hover {
         background-color: #f1f1f1;
     }
+
+    /* Tab Styles */
+    .nav-tabs {
+        border-bottom: 2px solid #dee2e6;
+        margin-bottom: 1.5rem;
+    }
+
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 500;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+        }
+
+            .nav-tabs .nav-link.active {
+                color: #007bff;
+                background-color: transparent;
+                border-bottom: 3px solid #007bff;
+                font-weight: 600;
+            }
+
+            .nav-tabs .nav-link:hover {
+                border: none;
+                border-bottom: 3px solid #6c757d;
+            }
+
+    .tab-content {
+        background-color: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .tab-pane {
+        min-height: 400px;
+    }
+
+    .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .rate-high {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .rate-medium {
+        color: #ffc107;
+        font-weight: bold;
+    }
+
+    .rate-low {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .not-done-cell {
+        color: #6c757d;
+        font-style: italic;
+    }
 </style>
 
 <div class="border rounded p-4 mb-4 mt-5" style="border: 2px solid #dee2e6; background-color: #ffffff;">
@@ -97,230 +160,186 @@
         <a asp-action="ExportToExcel" class="btn btn-success export-btn">Export to Excel</a>
     </div>
 
-    <div class="row">
-        <!-- Physicians Card -->
-        <div class="col-md-6 mb-4">
-            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#physiciansModal" style="cursor: pointer;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Attendance for Physicians</h5>
-                    <p class="card-text text-muted">View detailed fit testing attendance for physicians.</p>
-                </div>
-            </div>
-        </div>
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="physicians-tab" data-bs-toggle="tab" data-bs-target="#physicians" type="button" role="tab" aria-controls="physicians" aria-selected="true">
+                Physicians
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nursing-tab" data-bs-toggle="tab" data-bs-target="#nursing" type="button" role="tab" aria-controls="nursing" aria-selected="false">
+                Nursing & Allied
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab" aria-controls="summary" aria-selected="false">
+                Summary Reports
+            </button>
+        </li>
+    </ul>
 
-        <!-- Modal for Attendance for Physicians -->
-        <div class="modal fade" id="physiciansModal" tabindex="-1" aria-labelledby="physiciansModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="physiciansModalLabel">Attendance for Physicians</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="table-container">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Department/Unit/Office</th>
-                                        <th>Professional Category</th>
-                                        <th>Fit Test Solution</th>
-                                        <th>Status</th>
-                                        <th>Fit Tester</th>
-                                        <th>Date Fit Tested</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (attendanceForPhysicians != null)
-                                    {
-                                        @foreach (var item in attendanceForPhysicians.Take(10))
-                                        {
-                                            <tr>
-                                                <td>@item.HCW_Name</td>
-                                                <td>@item.DUO</td>
-                                                <td>@item.Professional_Category</td>
-                                                <td>@item.Fit_Test_Solution</td>
-                                                <td>@item.Status</td>
-                                                <td>@item.Name_of_Fit_Tester</td>
-                                                <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Button to Trigger Modal for Nursing and Allied Table -->
-        <div class="col-md-6 mb-4">
-            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#nursingAndAlliedModal" style="cursor: pointer;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Attendance for Nursing and Allied</h5>
-                    <p class="card-text text-muted">View detailed fit testing attendance for nursing and allied staff.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal for Attendance for Nursing and Allied -->
-        <div class="modal fade" id="nursingAndAlliedModal" tabindex="-1" aria-labelledby="nursingAndAlliedModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="nursingAndAlliedModalLabel">Attendance for Nursing and Allied</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="table-container">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>HCW Name</th>
-                                        <th>DUO</th>
-                                        <th>Professional Category</th>
-                                        <th>Fit Test Solution</th>
-                                        <th>Status</th>
-                                        <th>Fit Tester</th>
-                                        <th>Date Fit Tested</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in ViewBag.AttendanceForNursingAndAllied)
-                                    {
-                                        <tr>
-                                            <td>@item.HCW_Name</td>
-                                            <td>@item.DUO</td>
-                                            <td>@item.Professional_Category</td>
-                                            <td>@item.Fit_Test_Solution</td>
-                                            <td class="@(item.Test_Results == "Expired" ? "text-danger" : "text-success")">
-                                                @item.Test_Results
-                                            </td>
-                                            <td>@item.Name_of_Fit_Tester</td>
-                                            <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DUO Unit Tally Card -->
-        <div class="col-md-6 mb-4">
-            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#duoUnitTallyModal" style="cursor: pointer;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">DUO Unit Tally Report</h5>
-                    <p class="card-text text-muted">See total and expired fit tests by department/unit.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- DUO Unit Tally Report Modal -->
-        <div class="modal fade" id="duoUnitTallyModal" tabindex="-1" aria-labelledby="duoUnitTallyModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="duoUnitTallyModalLabel">DUO Unit Tally Report</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="table-container">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Department / Unit</th>
-                                        <th>Total Fit Tested</th>
-                                        <th>Passed</th>
-                                        <th>Failed</th>
-                                        <th>Expired</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.TallyReport != null)
-                                    {
-                                        foreach (var unit in ViewBag.TallyReport)
-                                        {
-                                            <tr>
-                                                <td>@unit.Unit</td>
-                                                <td>@unit.TotalFitTested</td>
-                                                <td>@unit.Passed</td>
-                                                <td>@unit.Failed</td>
-                                                <td class="@(unit.Expired > 0 ? "text-danger" : "text-success")">@unit.Expired</td>
-                                            </tr>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <tr><td colspan="5" class="text-muted">No data available.</td></tr>
-                                    }
-                                </tbody>
-                                <tfoot class="footer-table">
-                                    <tr>
-                                        <th>Total</th>
-                                        <th>@ViewBag.TotalFitTestedReport</th>
-                                        <th>@ViewBag.TotalPassedReport</th>
-                                        <th>@ViewBag.TotalFailedReport</th>
-                                        <th class="@(ViewBag.TotalExpiredReport > 0 ? "text-danger" : "text-success")">@ViewBag.TotalExpiredReport</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Button to Trigger Modal for Grand Total -->
-        <div class="col-md-6 mb-4">
-            <div class="card report-card shadow-sm" data-bs-toggle="modal" data-bs-target="#grandTotalModal" style="cursor: pointer;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Grand Total</h5>
-                    <p class="card-text text-muted">View the overall fit testing summary.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal for Grand Total -->
-        <div class="modal fade" id="grandTotalModal" tabindex="-1" aria-labelledby="grandTotalModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="grandTotalModalLabel">Grand Total</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered grand-total-table">
-                            <thead>
+    <!-- Tab Content -->
+    <div class="tab-content" id="reportTabsContent">
+        <!-- Physicians Tab -->
+        <div class="tab-pane fade show active" id="physicians" role="tabpanel" aria-labelledby="physicians-tab">
+            <h5 class="mb-3">Attendance for Physicians</h5>
+            <div class="table-container">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Department/Unit/Office</th>
+                            <th>Professional Category</th>
+                            <th>Fit Test Solution</th>
+                            <th>Status</th>
+                            <th>Fit Tester</th>
+                            <th>Date Fit Tested</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (attendanceForPhysicians != null)
+                        {
+                            @foreach (var item in attendanceForPhysicians)
+                            {
                                 <tr>
-                                    <th>Category</th>
+                                    <td>@item.HCW_Name</td>
+                                    <td>@item.DUO</td>
+                                    <td>@item.Professional_Category</td>
+                                    <td>@item.Fit_Test_Solution</td>
+                                    <td>@item.Status</td>
+                                    <td>@item.Name_of_Fit_Tester</td>
+                                    <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No data available for physicians.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Nursing & Allied Tab -->
+        <div class="tab-pane fade" id="nursing" role="tabpanel" aria-labelledby="nursing-tab">
+            <h5 class="mb-3">Attendance for Nursing and Allied</h5>
+            <div class="table-container">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>HCW Name</th>
+                            <th>DUO</th>
+                            <th>Professional Category</th>
+                            <th>Fit Test Solution</th>
+                            <th>Status</th>
+                            <th>Fit Tester</th>
+                            <th>Date Fit Tested</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (attendanceForNursingAndAllied != null)
+                        {
+                            @foreach (var item in attendanceForNursingAndAllied)
+                            {
+                                <tr>
+                                    <td>@item.HCW_Name</td>
+                                    <td>@item.DUO</td>
+                                    <td>@item.Professional_Category</td>
+                                    <td>@item.Fit_Test_Solution</td>
+                                    <td class="@(item.Test_Results == "Expired" ? "text-danger" : "text-success")">
+                                        @item.Test_Results
+                                    </td>
+                                    <td>@item.Name_of_Fit_Tester</td>
+                                    <td>@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No data available for nursing and allied staff.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Reports Tab -->
+        <div class="tab-pane fade" id="summary" role="tabpanel" aria-labelledby="summary-tab">
+            <div class="row">
+                <!-- DUO Unit Tally Report -->
+                <div class="col-12 mb-4">
+                    <h5 class="mb-3">DUO Unit Tally Report</h5>
+                    <div class="table-container">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Department / Unit</th>
+                                    <th>Total Staff</th>
                                     <th>Total Fit Tested</th>
+                                    <th>Passed</th>
+                                    <th>Failed</th>
+                                    <th>Not Done</th>
                                     <th>Expired</th>
+                                    <th>Rate (%)</th>
+                                    <th>3M Aura</th>
+                                    <th>Grand Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Grand Total</td>
-                                    <td>@ViewBag.GrandTotalFitTested</td>
-                                    <td class="@(ViewBag.GrandTotalExpired > 0 ? "text-danger" : "text-success")">@ViewBag.GrandTotalExpired</td>
-                                </tr>
+                                @if (ViewBag.TallyReport != null)
+                                {
+                                    foreach (var unit in ViewBag.TallyReport)
+                                    {
+                                        // Calculate rate percentage
+                                        var rate = unit.TotalStaff > 0 ? (unit.TotalFitTested * 100.0 / unit.TotalStaff) : 0;
+                                        var rateClass = rate >= 80 ? "rate-high" : rate >= 50 ? "rate-medium" : "rate-low";
+
+                                        <tr>
+                                            <td class="text-start">@unit.Unit</td>
+                                            <td>@unit.TotalStaff</td>
+                                            <td>@unit.TotalFitTested</td>
+                                            <td>@unit.Passed</td>
+                                            <td>@unit.Failed</td>
+                                            <td class="not-done-cell">@unit.NotDone</td>
+                                            <td class="@(unit.Expired > 0 ? "text-danger" : "text-success")">@unit.Expired</td>
+                                            <td class="@rateClass">@rate.ToString("F1")%</td>
+                                            <td>@(unit.ThreeMAura ?? 0)</td>
+                                            <td class="fw-bold">@unit.GrandTotal</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="10" class="text-center text-muted">No data available.</td></tr>
+                                }
                             </tbody>
+                            <tfoot class="footer-table table-light">
+                                <tr>
+                                    <th class="text-start">Total</th>
+                                    <th>@ViewBag.TotalStaffReport</th>
+                                    <th>@ViewBag.TotalFitTestedReport</th>
+                                    <th>@ViewBag.TotalPassedReport</th>
+                                    <th>@ViewBag.TotalFailedReport</th>
+                                    <th class="not-done-cell">@ViewBag.TotalNotDoneReport</th>
+                                    <th class="@(ViewBag.TotalExpiredReport > 0 ? "text-danger" : "text-success")">@ViewBag.TotalExpiredReport</th>
+                                    <th>
+                                        @{
+                                            var overallRate = ViewBag.TotalStaffReport > 0 ? (ViewBag.TotalFitTestedReport * 100.0 / ViewBag.TotalStaffReport) : 0;
+                                            var overallRateClass = overallRate >= 80 ? "rate-high" : overallRate >= 50 ? "rate-medium" : "rate-low";
+                                        }
+                                        <span class="@overallRateClass">@overallRate.ToString("F1")%</span>
+                                    </th>
+                                    <th>@ViewBag.TotalThreeMAuraReport</th>
+                                    <th class="fw-bold">@ViewBag.TotalGrandTotalReport</th>
+                                </tr>
+                            </tfoot>
                         </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
