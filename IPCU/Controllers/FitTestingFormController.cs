@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+﻿
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using IPCU.Data;
 using IPCU.Models;
@@ -236,39 +237,39 @@ namespace IPCU.Controllers
         }
 
         [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> AddTest(FitTestingFormHistory model)
-{
-    if (!ModelState.IsValid)
-    {
-        return View("AddTest", model);
-    }
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddTest(FitTestingFormHistory model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("AddTest", model);
+            }
 
-    // Set SubmittedAt since it's immutable
-    var history = new FitTestingFormHistory
-    {
-        FitTestingFormId = model.FitTestingFormId,
-        Fit_Test_Solution = model.Fit_Test_Solution,
-        Sensitivity_Test = model.Sensitivity_Test,
-        Respiratory_Type = model.Respiratory_Type,
-        Model = model.Model,
-        Size = model.Size,
-        Normal_Breathing = model.Normal_Breathing,
-        Deep_Breathing = model.Deep_Breathing,
-        Turn_head_side_to_side = model.Turn_head_side_to_side,
-        Move_head_up_and_down = model.Move_head_up_and_down,
-        Reading = model.Reading,
-        Bending_Jogging = model.Bending_Jogging,
-        Normal_Breathing_2 = model.Normal_Breathing_2,
-        Test_Results = model.Test_Results,
-        SubmittedAt = DateTime.UtcNow // Set timestamp
-    };
+            // Set SubmittedAt since it's immutable
+            var history = new FitTestingFormHistory
+            {
+                FitTestingFormId = model.FitTestingFormId,
+                Fit_Test_Solution = model.Fit_Test_Solution,
+                Sensitivity_Test = model.Sensitivity_Test,
+                Respiratory_Type = model.Respiratory_Type,
+                Model = model.Model,
+                Size = model.Size,
+                Normal_Breathing = model.Normal_Breathing,
+                Deep_Breathing = model.Deep_Breathing,
+                Turn_head_side_to_side = model.Turn_head_side_to_side,
+                Move_head_up_and_down = model.Move_head_up_and_down,
+                Reading = model.Reading,
+                Bending_Jogging = model.Bending_Jogging,
+                Normal_Breathing_2 = model.Normal_Breathing_2,
+                Test_Results = model.Test_Results,
+                SubmittedAt = DateTime.UtcNow // Set timestamp
+            };
 
-    _context.FitTestingFormHistory.Add(history);
-    await _context.SaveChangesAsync();
+            _context.FitTestingFormHistory.Add(history);
+            await _context.SaveChangesAsync();
 
-    return RedirectToAction("Index"); // Adjust to your desired redirect
-}
+            return RedirectToAction("Index"); // Adjust to your desired redirect
+        }
 
 
 
@@ -744,6 +745,35 @@ public async Task<IActionResult> AddTest(FitTestingFormHistory model)
                     return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Fit_Testing_Reports.xlsx");
                 }
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Preview(FitTestingForm fitTestingForm, string? OtherLimitation)
+        {
+            // Process limitations similar to Create action
+            var limitations = Request.Form["Limitation"].ToList();
+            if (limitations != null && limitations.Any())
+            {
+                if (limitations.Contains("Other"))
+                {
+                    if (!string.IsNullOrWhiteSpace(OtherLimitation))
+                    {
+                        limitations.Remove("Other");
+                        limitations.Add(OtherLimitation.Trim());
+                    }
+                }
+                fitTestingForm.Limitation = string.Join(", ", limitations.Where(x => !string.IsNullOrWhiteSpace(x)));
+            }
+            else
+            {
+                fitTestingForm.Limitation = "None";
+            }
+
+            // Pass OtherLimitation to the view if needed
+            ViewBag.OtherLimitation = OtherLimitation;
+
+            return PartialView("_Preview", fitTestingForm);
         }
 
         [HttpGet]
