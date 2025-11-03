@@ -237,15 +237,27 @@
 
                         <!-- Model -->
                         <div class="mb-3">
-                            <label for="model" class="form-label">Model</label>
-                            <input type="text" class="form-control" id="model" name="Model" value="" />
+                            <label asp-for="Model" class="form-label fw-bold">Model</label>
+                            <select asp-for="Model" class="form-select" id="model" name="Model">
+                                <option value="">Select Model</option>
+                                <option value="Flat-type">Flat-type</option>
+                                <option value="Aura">Aura</option>
+                            </select>
+                            <span asp-validation-for="Model" class="text-danger"></span>
                         </div>
 
                         <!-- Size -->
                         <div class="mb-3">
-                            <label for="size" class="form-label">Size</label>
-                            <input type="text" class="form-control" id="size" name="Size" value="" />
+                            <label asp-for="Size" class="form-label fw-bold">Size</label>
+                            <select asp-for="Size" class="form-select" id="size" name="Size">
+                                <option value="">Select Size</option>
+                                <option value="Regular">Regular</option>
+                                <option value="1870+">1870+</option>
+                            </select>
+                            <span asp-validation-for="Size" class="text-danger"></span>
                         </div>
+
+
 
                         <!-- Breathing and Movement Tests -->
                         <div class="row">

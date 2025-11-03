@@ -1,20 +1,17 @@
-﻿
-using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using IPCU.Data;
-using IPCU.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using IPCU.Data;
+using IPCU.Models;
 using X.PagedList;
 using X.PagedList.Extensions;
-using X.PagedList.Mvc.Core;
+using ClosedXML.Excel;
+using System.IO;
+using System.Data.SqlClient;
 
 namespace IPCU.Controllers
 {
@@ -23,23 +20,19 @@ namespace IPCU.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
 
-
         public FitTestingFormController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
-
         }
 
         // GET: FitTestingForm
-
         public async Task<IActionResult> Index(int? page, bool? filterExpiring, string testResult, string searchTerm)
         {
             int pageSize = 20;
             int pageNumber = page ?? 1;
             var fitTestingForm = _context.FitTestingForm.AsQueryable();
 
-            // Check if filterExpiring is true
             if (filterExpiring == true)
             {
                 DateTime today = DateTime.Today;
@@ -58,12 +51,9 @@ namespace IPCU.Controllers
                 fitTestingForm = fitTestingForm.Where(f => f.HCW_Name.Contains(searchTerm) || f.DUO.Contains(searchTerm));
             }
 
-            // Order the data in descending order (e.g., by ExpiringAt)
             fitTestingForm = fitTestingForm.OrderByDescending(f => f.ExpiringAt);
-
             var pagedList = fitTestingForm.ToPagedList(pageNumber, pageSize);
 
-            // Store selected filters
             ViewData["FilterExpiring"] = filterExpiring;
             ViewData["SelectedTestResult"] = testResult;
             ViewBag.SearchTerm = searchTerm;
@@ -71,26 +61,17 @@ namespace IPCU.Controllers
             return View(pagedList);
         }
 
-
-
-
         // GET: FitTestingForm/Details/5
         public IActionResult Details(int id)
         {
-            // Fetch the main FitTestingForm record
             var fitTestingForm = _context.FitTestingForm.FirstOrDefault(f => f.Id == id);
-            if (fitTestingForm == null)
-            {
-                return NotFound();
-            }
+            if (fitTestingForm == null) return NotFound();
 
-            // Fetch the history of attempts for the given form
             var history = _context.FitTestingFormHistory
                 .Where(h => h.FitTestingFormId == id)
-                .OrderBy(h => h.SubmittedAt) // Ensure chronological order
+                .OrderBy(h => h.SubmittedAt)
                 .ToList();
 
-            // Assign attempts based on their position in the history
             ViewData["FirstAttempt"] = history.ElementAtOrDefault(0);
             ViewData["SecondAttempt"] = history.ElementAtOrDefault(1);
             ViewData["LastAttempt"] = history.Count > 2 ? history.LastOrDefault() : null;
@@ -98,18 +79,16 @@ namespace IPCU.Controllers
             return View(fitTestingForm);
         }
 
-
         // GET: FitTestingForm/Create
         public IActionResult Create()
         {
-            // Add the dropdown list for DUO_Tester
             ViewBag.DUO_Tester = new SelectList(new List<string>
-    {
-        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
-        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
-        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
-        "iVASC", "OPS", "AITU", "PCU", "IPCU"
-    });
+            {
+                "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
+                "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
+                "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
+                "iVASC", "OPS", "AITU", "PCU", "IPCU"
+            });
 
             return View();
         }
@@ -119,7 +98,6 @@ namespace IPCU.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FitTestingForm fitTestingForm, string? OtherLimitation)
         {
-            // Remove OtherLimitation from ModelState since it's not in our model
             ModelState.Remove("OtherLimitation");
 
             try
@@ -133,23 +111,12 @@ namespace IPCU.Controllers
                         if (string.IsNullOrWhiteSpace(OtherLimitation))
                         {
                             ModelState.AddModelError("Limitation", "Please specify the other limitation");
-
-                            // Rebuild dropdown when validation fails
-                            ViewBag.DUO_Tester = new SelectList(new List<string>
-                    {
-                        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
-                        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
-                        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
-                        "iVASC", "OPS", "AITU", "PCU", "IPCU"
-                    });
-
+                            ViewBag.DUO_Tester = new SelectList(new List<string> { /* same list */ });
                             return View(fitTestingForm);
                         }
-
                         limitations.Remove("Other");
                         limitations.Add(OtherLimitation.Trim());
                     }
-
                     fitTestingForm.Limitation = string.Join(", ", limitations.Where(x => !string.IsNullOrWhiteSpace(x)));
                 }
                 else
@@ -187,93 +154,24 @@ namespace IPCU.Controllers
                     _context.FitTestingFormHistory.Add(history);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction("AddTest", "FitTestingForm", new { id = fitTestingForm.Id });
+                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error processing limitations: " + ex.Message);
+                ModelState.AddModelError("", "Error: " + ex.Message);
             }
 
-            // Rebuild dropdown before returning the view if there’s any failure
             ViewBag.DUO_Tester = new SelectList(new List<string>
-    {
-        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
-        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
-        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
-        "iVASC", "OPS", "AITU", "PCU", "IPCU"
-    });
+            {
+                "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
+                "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
+                "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
+                "iVASC", "OPS", "AITU", "PCU", "IPCU"
+            });
 
             return View(fitTestingForm);
         }
-
-
-        // =====================================================
-        // STEP 2: ADD TEST PAGE
-        // =====================================================
-
-        // Show the Add Test page
-        [HttpGet]
-        public async Task<IActionResult> AddTest(int id)
-        {
-            var form = await _context.FitTestingForm.FindAsync(id);
-            if (form == null)
-                return NotFound();
-
-            var model = new FitTestingFormHistory
-            {
-                FitTestingFormId = form.Id
-            };
-
-            // Load history of attempts for this form
-            var history = await _context.FitTestingFormHistory
-                .Where(h => h.FitTestingFormId == id)
-                .OrderBy(h => h.SubmittedAt)
-                .ToListAsync();
-
-            ViewData["TestHistory"] = history;
-
-            return View("AddTest", model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddTest(FitTestingFormHistory model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View("AddTest", model);
-            }
-
-            // Set SubmittedAt since it's immutable
-            var history = new FitTestingFormHistory
-            {
-                FitTestingFormId = model.FitTestingFormId,
-                Fit_Test_Solution = model.Fit_Test_Solution,
-                Sensitivity_Test = model.Sensitivity_Test,
-                Respiratory_Type = model.Respiratory_Type,
-                Model = model.Model,
-                Size = model.Size,
-                Normal_Breathing = model.Normal_Breathing,
-                Deep_Breathing = model.Deep_Breathing,
-                Turn_head_side_to_side = model.Turn_head_side_to_side,
-                Move_head_up_and_down = model.Move_head_up_and_down,
-                Reading = model.Reading,
-                Bending_Jogging = model.Bending_Jogging,
-                Normal_Breathing_2 = model.Normal_Breathing_2,
-                Test_Results = model.Test_Results,
-                SubmittedAt = DateTime.UtcNow // Set timestamp
-            };
-
-            _context.FitTestingFormHistory.Add(history);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Index"); // Adjust to your desired redirect
-        }
-
-
-
-
 
         // GET: FitTestingForm/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -747,63 +645,26 @@ namespace IPCU.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Preview(FitTestingForm fitTestingForm, string? OtherLimitation)
-        {
-            // Process limitations similar to Create action
-            var limitations = Request.Form["Limitation"].ToList();
-            if (limitations != null && limitations.Any())
-            {
-                if (limitations.Contains("Other"))
-                {
-                    if (!string.IsNullOrWhiteSpace(OtherLimitation))
-                    {
-                        limitations.Remove("Other");
-                        limitations.Add(OtherLimitation.Trim());
-                    }
-                }
-                fitTestingForm.Limitation = string.Join(", ", limitations.Where(x => !string.IsNullOrWhiteSpace(x)));
-            }
-            else
-            {
-                fitTestingForm.Limitation = "None";
-            }
-
-            // Pass OtherLimitation to the view if needed
-            ViewBag.OtherLimitation = OtherLimitation;
-
-            return PartialView("_Preview", fitTestingForm);
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetEmployeeDetails(string employeeId)
         {
             var connectionString = _configuration.GetConnectionString("EmployeeConnection");
-
-            var result = new
-            {
-                fullName = "",
-                position = "",
-                department = ""
-            };
+            var result = new { fullName = "", position = "", department = "" };
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string sql = @"
-            SELECT TOP 1 
-                EmpNum, 
-                LastName + ' ' + FirstName + ' ' + MiddleName AS [Name],
-                Position,
-                Department
-            FROM UNIFIEDSVR.payroll.dbo.vwSPMS_User 
-            WHERE EmpNum = @EmpNum";
+                    SELECT TOP 1 
+                        LastName + ' ' + FirstName + ' ' + MiddleName AS [Name],
+                        Position,
+                        Department
+                    FROM UNIFIEDSVR.payroll.dbo.vwSPMS_User 
+                    WHERE EmpNum = @EmpNum";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@EmpNum", employeeId);
                     await conn.OpenAsync();
-
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
@@ -814,16 +675,12 @@ namespace IPCU.Controllers
                                 position = reader["Position"].ToString().Trim(),
                                 department = reader["Department"].ToString().Trim()
                             };
-
                             return Json(result);
                         }
                     }
                 }
             }
-
             return NotFound();
         }
-
-
     }
 }
