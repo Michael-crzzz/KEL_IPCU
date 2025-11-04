@@ -81,21 +81,7 @@ public class FitTestingFormPdfService
                     });
 
                     // Fit Test Details
-                    content.Item().Border(1).BorderColor(Colors.Grey.Darken2).Column(col =>
-                    {
-                        col.Item().Padding(5).Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                            });
-                            AddTableRow(table, "Fit Test Solution:", "Bitter Amer (FT-32)");
-                            AddTableRow(table, "Sensitivity Test:", "12");
-                            AddTableRow(table, "Respirator Type:", "Bitter Amer (FT-32)");
-                            AddTableRow(table, "Model/Size:", "12 - REGULAR");
-                        });
-                    });
+                    
 
                     // Fit Test Activities Table with History
                     content.Item().Border(1).BorderColor(Colors.Grey.Darken2).Column(col =>
