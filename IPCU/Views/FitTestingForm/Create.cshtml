@@ -1,12 +1,9 @@
 ﻿@model IPCU.Models.FitTestingForm
-
 @{
     ViewData["Title"] = "Create Fit Testing Record";
 }
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-8 mx-auto">
@@ -15,52 +12,46 @@
                     <h3><i class="fa fa-user-md"></i> Create Fit Testing Record</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-action="Create" method="post" id="fitTestForm">
+                    <form asp-action="Create" method="post" id="fitTestForm" novalidate>
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <h5 class="fw-bold mb-4">Healthcare Worker Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="EmployeeId" class="form-label fw-bold">Employee ID</label>
+                                <input asp-for="EmployeeId" class="form-control" id="EmployeeId" autocomplete="off" />
+                                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="HCW_Name" class="form-label fw-bold">Healthcare Worker</label>
+                                <input asp-for="HCW_Name" class="form-control" id="HCW_Name" readonly />
+                                <span asp-validation-for="HCW_Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DUO" class="form-label fw-bold">Department/Unit/Office</label>
+                                <input asp-for="DUO" class="form-control" id="DUO" readonly />
+                                <span asp-validation-for="DUO" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Professional_Category" class="form-label fw-bold">Professional Category</label>
+                                <span class="text-success small fw-normal">(can be edit)</span>
+                                <input asp-for="Professional_Category" class="form-control" id="Professional_Category" />
+                                <span asp-validation-for="Professional_Category" class="text-danger"></span>
+                                <small class="text-muted">e.g. ACCOUNTANT I, BUYER III, NURSE II, </small>
 
-                        <h5 class="fw-bold">Healthcare Worker Information</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="EmployeeId" class="form-label fw-bold">Employee ID</label>
-                                    <input asp-for="EmployeeId" class="form-control" id="EmployeeId" />
-                                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="HCW_Name" class="form-label fw-bold">Healthcare Worker</label>
-                                    <input asp-for="HCW_Name" class="form-control" id="HCW_Name" />
-                                    <span asp-validation-for="HCW_Name" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="DUO" class="form-label fw-bold">Department/Unit/Office</label>
-                                    <input asp-for="DUO" class="form-control" id="DUO" />
-                                    <span asp-validation-for="DUO" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Professional_Category" class="form-label fw-bold">Professional Category</label>
-                                    <input asp-for="Professional_Category" class="form-control" id="Professional_Category" />
-                                    <span asp-validation-for="Professional_Category" class="text-danger"></span>
-                                </div>
                             </div>
                         </div>
-
-                        <!-- Limitations with Toggle Switch -->
-                        <div class="mb-3">
-                            <div class="form-check form-switch mb-3">
+                        <!-- Limitations with Accessible Toggle -->
+                        <div class="mt-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="toggleLimitations" role="switch"
+                                       aria-controls="limitationsContainer" aria-expanded="false">
                                 <label class="form-check-label fw-bold" for="toggleLimitations">Limitations</label>
-                                <input class="form-check-input" type="checkbox" id="toggleLimitations" role="switch">
                             </div>
-                            <div id="limitationsContainer" class="d-none">
-                                <div class="row">
+                            <div id="limitationsContainer" class="d-none mt-3" role="region" aria-labelledby="toggleLimitations">
+                                <div class="row g-3">
                                     <div class="col-md-6">
-                                        <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex flex-column gap-3">
                                             <div class="form-check">
                                                 <input class="form-check-input limitation-checkbox" type="checkbox" name="Limitation" value="Glasses" id="glasses">
                                                 <label class="form-check-label" for="glasses">Glasses</label>
@@ -76,7 +67,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex flex-column gap-3">
                                             <div class="form-check">
                                                 <input class="form-check-input limitation-checkbox" type="checkbox" name="Limitation" value="Cosmetic Surgery" id="cosmeticSurgery">
                                                 <label class="form-check-label" for="cosmeticSurgery">Cosmetic Surgery</label>
@@ -86,250 +77,237 @@
                                                 <label class="form-check-label" for="facialScarring">Facial Scarring</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input limitation-checkbox" type="checkbox" name="Limitation" value="Other" id="otherCheckbox">
+                                                <input class="form-check-input limitation-checkbox" type="checkbox" name="Limitation" value="Other" id="otherCheckbox"
+                                                       aria-controls="otherTextContainer" aria-expanded="false">
                                                 <label class="form-check-label" for="otherCheckbox">Other</label>
-                                            </div>
-                                            <div id="otherTextContainer" class="d-none mt-2">
-                                                <input type="text" name="OtherLimitation" id="otherText" class="form-control" placeholder="Specify other limitation" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Name_of_Fit_Tester" class="form-label fw-bold">Name of Fit Tester</label>
-                                    <select asp-for="Name_of_Fit_Tester" class="form-select" required>
-                                        <option value="">Select Fit Tester</option>
-                                        <option value="MVML">MVML</option>
-                                        <option value="ABV">ABV</option>
-                                        <option value="IPM">IPM</option>
-                                        <option value="JRH">JRH</option>
-                                        <option value="CGM">CGM</option>
-                                    </select>
-                                    <span asp-validation-for="Name_of_Fit_Tester" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="DUO_Tester" class="form-label fw-bold">Tester Dept/Unit/Office</label>
-                                    <select asp-for="DUO_Tester" class="form-select" asp-items="ViewBag.DUO_Tester">
-                                        <option value="">-- Select Department/Unit/Office --</option>
-                                    </select>
-                                    <span asp-validation-for="DUO_Tester" class="text-danger"></span>
+                                <div id="otherTextContainer" class="d-none mt-3">
+                                    <input type="text" name="OtherLimitation" id="otherText" class="form-control"
+                                           placeholder="Specify other limitation" aria-label="Specify other limitation">
                                 </div>
                             </div>
                         </div>
-
-                        <h5 class="fw-bold mt-3">Fit Test Details</h5>
-                        <div class="row">
+                        <div class="row g-3 mt-3">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Fit_Test_Solution" class="form-label fw-bold">Fit Test Solution</label>
-                                    <select asp-for="Fit_Test_Solution" class="form-select">
-                                        <option value="">Select Solution</option>
-                                        <option value="Bitter Amer (FT-32)">Bitter Amer (FT-32)</option>
-                                        <option value="Saccharin (FT-10)">Saccharin (FT-10)</option>
-                                        <option value="3M Aura">3M Aura</option>
-                                    </select>
-                                    <span asp-validation-for="Fit_Test_Solution" class="text-danger"></span>
-                                </div>
+                                <label asp-for="Name_of_Fit_Tester" class="form-label fw-bold">Name of Fit Tester</label>
+                                <select asp-for="Name_of_Fit_Tester" class="form-select" required>
+                                    <option value="">Select Fit Tester</option>
+                                    <option value="MVML">MVML</option>
+                                    <option value="ABV">ABV</option>
+                                    <option value="IPM">IPM</option>
+                                    <option value="JRH">JRH</option>
+                                    <option value="CGM">CGM</option>
+                                </select>
+                                <span asp-validation-for="Name_of_Fit_Tester" class="text-danger"></span>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Sensitivity_Test" class="form-label fw-bold">Sensitivity Test</label>
-                                    <input asp-for="Sensitivity_Test" class="form-control" type="number" min="1" max="30" placeholder="Enter Sensitivity Test (1-30)" />
-                                    <span asp-validation-for="Sensitivity_Test" class="text-danger"></span>
-                                </div>
+                                <label asp-for="DUO_Tester" class="form-label fw-bold">Tester Dept/Unit/Office</label>
+                                <select asp-for="DUO_Tester" class="form-select" asp-items="ViewBag.DUO_Tester">
+                                    <option value="">-- Select Department/Unit/Office --</option>
+                                </select>
+                                <span asp-validation-for="DUO_Tester" class="text-danger"></span>
                             </div>
                         </div>
-
-                        <h5 class="fw-bold mt-3">Respiratory Information</h5>
-                        <div class="row">
+                        <h5 class="fw-bold mt-4 mb-3">Fit Test Details</h5>
+                        <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Respiratory_Type" class="form-label fw-bold">Respiratory Type</label>
-                                    <select asp-for="Respiratory_Type" class="form-select">
-                                        <option value="">Select Respiratory Type</option>
-                                        <option value="BTL">BTL</option>
-                                        <option value="3M Aura">3M Aura</option>
-                                    </select>
-                                    <span asp-validation-for="Respiratory_Type" class="text-danger"></span>
-                                </div>
+                                <label asp-for="Fit_Test_Solution" class="form-label fw-bold">Fit Test Solution</label>
+                                <select asp-for="Fit_Test_Solution" class="form-select">
+                                    <option value="">Select Solution</option>
+                                    <option value="Bitter Amer (FT-32)">Bitter Amer (FT-32)</option>
+                                    <option value="Saccharin (FT-10)">Saccharin (FT-10)</option>
+                                    <option value="3M Aura">3M Aura</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Model" class="form-label fw-bold">Model</label>
-                                    <select asp-for="Model" class="form-select">
-                                        <option value="">Select Model</option>
-                                        <option value="Flat-type">Flat-type</option>
-                                        <option value="Aura">Aura</option>
-                                    </select>
-                                    <span asp-validation-for="Model" class="text-danger"></span>
-                                </div>
+                                <label asp-for="Sensitivity_Test" class="form-label fw-bold">Sensitivity Test</label>
+                                <input asp-for="Sensitivity_Test" class="form-control" type="number" min="1" max="30"
+                                       placeholder="Enter Sensitivity Test (1-30)" />
                             </div>
                         </div>
-                        <div class="mb-3">
+                        <h5 class="fw-bold mt-4 mb-3">Respiratory Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Respiratory_Type" class="form-label fw-bold">Respiratory Type</label>
+                                <select asp-for="Respiratory_Type" class="form-select">
+                                    <option value="">Select Respiratory Type</option>
+                                    <option value="BTL">BTL</option>
+                                    <option value="3M Aura">3M Aura</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Model" class="form-label fw-bold">Model</label>
+                                <select asp-for="Model" class="form-select">
+                                    <option value="">Select Model</option>
+                                    <option value="Flat-type">Flat-type</option>
+                                    <option value="Aura">Aura</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-3">
                             <label asp-for="Size" class="form-label fw-bold">Size</label>
                             <select asp-for="Size" class="form-select">
                                 <option value="">Select Size</option>
                                 <option value="Regular">Regular</option>
                                 <option value="1870+">1870+</option>
                             </select>
-                            <span asp-validation-for="Size" class="text-danger"></span>
                         </div>
-
-                        <h5 class="fw-bold mt-3">Breathing & Movement Tests</h5>
+                        <h5 class="fw-bold mt-4 mb-3">Breathing & Movement Tests</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-check mb-2">
-                                    <input asp-for="Normal_Breathing" class="form-check-input" type="checkbox" id="Normal_Breathing" value="true">
-                                    <input type="hidden" name="Normal_Breathing" value="false" />
-                                    <label class="form-check-label" for="Normal_Breathing">Normal Breathing</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input asp-for="Deep_Breathing" class="form-check-input" type="checkbox" id="Deep_Breathing" value="true">
-                                    <input type="hidden" name="Deep_Breathing" value="false" />
-                                    <label class="form-check-label" for="Deep_Breathing">Deep Breathing</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input asp-for="Turn_head_side_to_side" class="form-check-input" type="checkbox" id="Turn_head_side_to_side" value="true">
-                                    <input type="hidden" name="Turn_head_side_to_side" value="false" />
-                                    <label class="form-check-label" for="Turn_head_side_to_side">Turn Head Side to Side</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input asp-for="Move_head_up_and_down" class="form-check-input" type="checkbox" id="Move_head_up_and_down" value="true">
-                                    <input type="hidden" name="Move_head_up_and_down" value="false" />
-                                    <label class="form-check-label" for="Move_head_up_and_down">Move Head Up and Down</label>
-                                </div>
+                                <div class="form-check mb-3"><input asp-for="Normal_Breathing" class="form-check-input" type="checkbox" id="Normal_Breathing" value="true"><input type="hidden" name="Normal_Breathing" value="false"><label class="form-check-label" for="Normal_Breathing">Normal Breathing</label></div>
+                                <div class="form-check mb-3"><input asp-for="Deep_Breathing" class="form-check-input" type="checkbox" id="Deep_Breathing" value="true"><input type="hidden" name="Deep_Breathing" value="false"><label class="form-check-label" for="Deep_Breathing">Deep Breathing</label></div>
+                                <div class="form-check mb-3"><input asp-for="Turn_head_side_to_side" class="form-check-input" type="checkbox" id="Turn_head_side_to_side" value="true"><input type="hidden" name="Turn_head_side_to_side" value="false"><label class="form-check-label" for="Turn_head_side_to_side">Turn Head Side to Side</label></div>
+                                <div class="form-check mb-3"><input asp-for="Move_head_up_and_down" class="form-check-input" type="checkbox" id="Move_head_up_and_down" value="true"><input type="hidden" name="Move_head_up_and_down" value="false"><label class="form-check-label" for="Move_head_up_and_down">Move Head Up and Down</label></div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-check mb-2">
-                                    <input asp-for="Reading" class="form-check-input" type="checkbox" id="Reading" value="true">
-                                    <input type="hidden" name="Reading" value="false" />
-                                    <label class="form-check-label" for="Reading">Reading</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input asp-for="Bending_Jogging" class="form-check-input" type="checkbox" id="Bending_Jogging" value="true">
-                                    <input type="hidden" name="Bending_Jogging" value="false" />
-                                    <label class="form-check-label" for="Bending_Jogging">Bending/Jogging</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input asp-for="Normal_Breathing_2" class="form-check-input" type="checkbox" id="Normal_Breathing_2" value="true">
-                                    <input type="hidden" name="Normal_Breathing_2" value="false" />
-                                    <label class="form-check-label" for="Normal_Breathing_2">Normal Breathing (2)</label>
-                                </div>
+                                <div class="form-check mb-3"><input asp-for="Reading" class="form-check-input" type="checkbox" id="Reading" value="true"><input type="hidden" name="Reading" value="false"><label class="form-check-label" for="Reading">Reading</label></div>
+                                <div class="form-check mb-3"><input asp-for="Bending_Jogging" class="form-check-input" type="checkbox" id="Bending_Jogging" value="true"><input type="hidden" name="Bending_Jogging" value="false"><label class="form-check-label" for="Bending_Jogging">Bending/Jogging</label></div>
+                                <div class="form-check mb-3"><input asp-for="Normal_Breathing_2" class="form-check-input" type="checkbox" id="Normal_Breathing_2" value="true"><input type="hidden" name="Normal_Breathing_2" value="false"><label class="form-check-label" for="Normal_Breathing_2">Normal Breathing (2)</label></div>
                             </div>
                         </div>
-
-                        <div class="d-flex justify-content-between mt-4">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="fa fa-arrow-left"></i> Back
+                        <div class="d-flex justify-content-between mt-5 pt-4 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                <i class="fa fa-arrow-left me-2"></i> Back to List
                             </a>
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i> Submit Fit Test
+                            <button type="submit" class="btn btn-success px-5" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i> Submit Record
                             </button>
                         </div>
+
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <style>
-    .form-check.form-switch .form-check-input {
-        width: 2.5em;
-        height: 1.25em;
+    :root {
+        --switch-width: 3.5em;
+        --switch-height: 1.8em;
+    }
+
+    (max-width: 576px) {
+        : root
+
+    {
+        --switch-width: 4em;
+        --switch-height: 2em;
+    }
+
+    }
+
+    .form-check-input:focus-visible {
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .form-check-label {
+        color: #212529;
         cursor: pointer;
     }
 
-    .form-check.form-switch .form-check-label {
-        font-size: 1rem;
-        color: black;
+    .form-control[readonly] {
+        background-color: #e9ecef;
     }
 
-    .form-check .form-check-label {
-        font-size: 1rem;
-        color: #495057;
+    .loading::after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: -0.6em;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 0.8s linear infinite;
     }
 
-    .gap-2 {
-        gap: 0.5rem;
-    }
-
-    #limitationsContainer.d-none,
-    #otherTextContainer.d-none {
-        display: none !important;
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>
-
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-
     <script>
-        $(document).ready(function () {
-            // Employee ID auto-fill
-            $("#EmployeeId").on("blur", function () {
-                const empId = this.value.trim();
-                if (empId !== "") {
-                    fetch(`/FitTestingForm/GetEmployeeDetails?employeeId=${encodeURIComponent(empId)}`)
-                        .then(response => {
-                            if (!response.ok) throw new Error("Not found");
-                            return response.json();
-                        })
-                        .then(data => {
-                            $("#HCW_Name").val(data.fullName);
-                            $("#Professional_Category").val(data.position);
-                            $("#DUO").val(data.department);
-                        })
-                        .catch(() => {
-                            $("#HCW_Name").val("");
-                            $("#Professional_Category").val("");
-                            $("#DUO").val("");
-                        });
+        document.addEventListener("DOMContentLoaded", () => {
+            const empId = document.getElementById("EmployeeId");
+            const name = document.getElementById("HCW_Name");
+            const prof = document.getElementById("Professional_Category");
+            const duo = document.getElementById("DUO");
+            const toggle = document.getElementById("toggleLimitations");
+            const limContainer = document.getElementById("limitationsContainer");
+            const otherCheck = document.getElementById("otherCheckbox");
+            const otherTextContainer = document.getElementById("otherTextContainer");
+            const otherText = document.getElementById("otherText");
+            const form = document.getElementById("fitTestForm");
+            const submitBtn = document.getElementById("submitBtn");
+            const clearAutoFields = () => {
+                name.value = prof.value = duo.value = "";
+                empId.classList.remove("loading");
+            };
+            // Employee ID live lookup + instant clear
+            empId.addEventListener("input", async () => {
+                const id = empId.value.trim();
+                empId.classList.toggle("loading", !!id);
+                if (!id) { clearAutoFields(); return; }
+                try {
+                    const res = await fetch(`/FitTestingForm/GetEmployeeDetails?employeeId=${encodeURIComponent(id)}`);
+                    if (!res.ok) throw new Error();
+                    const data = await res.json();
+                    name.value = data.fullName || "";
+                    duo.value = data.department || "";
+                    prof.value = data.position || ""; /* NOW AUTO-FILLED AND EDITABLE */
+                } catch {
+                    clearAutoFields();
+                }
+            });
+            // Limitations master toggle
+            toggle.addEventListener("change", () => {
+                const checked = toggle.checked;
+                limContainer.classList.toggle("d-none", !checked);
+                toggle.setAttribute("aria-expanded", checked);
+                if (!checked) {
+                    limContainer.querySelectorAll(".limitation-checkbox").forEach(c => c.checked = false);
+                    otherCheck.checked = false;
+                    otherTextContainer.classList.add("d-none");
+                    otherCheck.setAttribute("aria-expanded", false);
+                    otherText.value = "";
+                }
+            });
+            // Other checkbox toggle
+            otherCheck.addEventListener("change", () => {
+                const checked = otherCheck.checked;
+                otherTextContainer.classList.toggle("d-none", !checked);
+                otherCheck.setAttribute("aria-expanded", checked);
+                if (!checked) otherText.value = "";
+            });
+            // Modern validation for "Other" text
+            form.addEventListener("submit", e => {
+                if (otherCheck.checked && !otherText.value.trim()) {
+                    e.preventDefault();
+                    otherText.setCustomValidity("Please specify the other limitation.");
+                    otherText.reportValidity();
+                    otherText.focus();
                 } else {
-                    $("#HCW_Name").val("");
-                    $("#Professional_Category").val("");
-                    $("#DUO").val("");
+                    otherText.setCustomValidity("");
                 }
+                
             });
-
-            // Limitations toggle
-            const toggleLimitations = $("#toggleLimitations");
-            const limitationsContainer = $("#limitationsContainer");
-            const otherCheckbox = $("#otherCheckbox");
-            const otherTextContainer = $("#otherTextContainer");
-            const otherText = $("#otherText");
-
-            toggleLimitations.on("change", function () {
-                limitationsContainer.toggleClass("d-none", !this.checked);
-                if (!this.checked) {
-                    $(".limitation-checkbox").prop("checked", false);
-                    otherTextContainer.addClass("d-none");
-                    otherText.val("");
-                }
-            });
-
-            otherCheckbox.on("change", function () {
-                otherTextContainer.toggleClass("d-none", !this.checked);
-                if (!this.checked) {
-                    otherText.val("");
-                }
-            });
-
-        // Only validate "Other" text if checked
-               $("#fitTestForm").on("submit", function (e) {
-                   if (otherCheckbox.is(":checked") && !otherText.val().trim()) {
-                       e.preventDefault();
-                       alert("Please specify the other limitation.");
-                   }
-               });
-           });
+            // Clean up on page hide (optional)
+            window.addEventListener("pagehide", clearAutoFields);
+        });
     </script>
-    }
+}

@@ -496,16 +496,36 @@ namespace IPCU.Controllers
             var fitTests = _context.FitTestingForm.ToList();
             var currentDate = DateTime.Now;
 
-            // Get data using the same logic as Reports method
             var attendanceForPhysicians = fitTests
-                .Where(f => physicianCategories.Contains(f.Professional_Category) && f.Test_Results == "Passed")
+                .Where(f => physicianCategories.Contains(f.Professional_Category))
+                .Select(f => new FitTestingForm
+                {
+                    HCW_Name = f.HCW_Name,
+                    DUO = f.DUO,
+                    Professional_Category = f.Professional_Category,
+                    Fit_Test_Solution = f.Fit_Test_Solution,
+                    Test_Results = f.ExpiringAt < currentDate ? "Expired" : f.Test_Results,
+                    Name_of_Fit_Tester = f.Name_of_Fit_Tester,
+                    SubmittedAt = f.SubmittedAt
+                })
+                .Where(f => f.Test_Results == "Passed" || f.Test_Results == "Expired")
                 .ToList();
 
             var attendanceForNursingAndAllied = fitTests
-                .Where(f => !physicianCategories.Contains(f.Professional_Category) && f.Test_Results == "Passed")
+                .Where(f => !physicianCategories.Contains(f.Professional_Category))
+                .Select(f => new FitTestingForm
+                {
+                    HCW_Name = f.HCW_Name,
+                    DUO = f.DUO,
+                    Professional_Category = f.Professional_Category,
+                    Fit_Test_Solution = f.Fit_Test_Solution,
+                    Test_Results = f.ExpiringAt < currentDate ? "Expired" : f.Test_Results,
+                    Name_of_Fit_Tester = f.Name_of_Fit_Tester,
+                    SubmittedAt = f.SubmittedAt
+                })
+                .Where(f => f.Test_Results == "Passed" || f.Test_Results == "Expired")
                 .ToList();
 
-            // Updated tally report with ALL columns matching the web view
             var tallyReport = duoList
                 .Select(unit => new
                 {
@@ -523,128 +543,106 @@ namespace IPCU.Controllers
 
             using (var workbook = new XLWorkbook())
             {
-                void FormatHeaders(IXLWorksheet sheet, int columnCount)
+                void FormatHeaders(IXLWorksheet ws, int cols)
                 {
-                    var headerRow = sheet.Row(1);
-                    headerRow.Style.Font.Bold = true;
-                    headerRow.Style.Fill.BackgroundColor = XLColor.LightGray;
-                    sheet.Columns(1, columnCount).AdjustToContents();
+                    ws.Row(1).Style.Font.Bold = true;
+                    ws.Row(1).Style.Fill.BackgroundColor = XLColor.LightGray;
+                    ws.Columns(1, cols).AdjustToContents();
                 }
 
-                // Physicians Worksheet
-                var worksheet1 = workbook.Worksheets.Add("Physicians");
-                worksheet1.Cell(1, 1).Value = "Name";
-                worksheet1.Cell(1, 2).Value = "Department/Unit/Office";
-                worksheet1.Cell(1, 3).Value = "Professional Category";
-                worksheet1.Cell(1, 4).Value = "Fit Test Solution";
-                worksheet1.Cell(1, 5).Value = "Status";
-                worksheet1.Cell(1, 6).Value = "Fit Tester";
-                worksheet1.Cell(1, 7).Value = "Date Fit Tested";
-                FormatHeaders(worksheet1, 7);
+                // Physicians Sheet
+                var ws1 = workbook.Worksheets.Add("Physicians");
+                ws1.Cell(1, 1).Value = "Name"; ws1.Cell(1, 2).Value = "Department/Unit/Office";
+                ws1.Cell(1, 3).Value = "Professional Category"; ws1.Cell(1, 4).Value = "Fit Test Solution";
+                ws1.Cell(1, 5).Value = "Status"; ws1.Cell(1, 6).Value = "Fit Tester"; ws1.Cell(1, 7).Value = "Date Fit Tested";
+                FormatHeaders(ws1, 7);
 
                 int row = 2;
-                foreach (var item in attendanceForPhysicians)
+                foreach (var p in attendanceForPhysicians)
                 {
-                    worksheet1.Cell(row, 1).Value = item.HCW_Name;
-                    worksheet1.Cell(row, 2).Value = item.DUO;
-                    worksheet1.Cell(row, 3).Value = item.Professional_Category;
-                    worksheet1.Cell(row, 4).Value = item.Fit_Test_Solution;
-                    worksheet1.Cell(row, 5).Value = item.Test_Results;
-                    worksheet1.Cell(row, 6).Value = item.Name_of_Fit_Tester;
-                    worksheet1.Cell(row, 7).Value = item.SubmittedAt.ToString("yyyy-MM-dd");
+                    ws1.Cell(row, 1).Value = p.HCW_Name;
+                    ws1.Cell(row, 2).Value = p.DUO;
+                    ws1.Cell(row, 3).Value = p.Professional_Category;
+                    ws1.Cell(row, 4).Value = p.Fit_Test_Solution;
+                    ws1.Cell(row, 5).Value = p.Test_Results;
+                    ws1.Cell(row, 6).Value = p.Name_of_Fit_Tester;
+                    ws1.Cell(row, 7).Value = p.SubmittedAt.ToString("yyyy-MM-dd");
                     row++;
                 }
 
-                // Nursing & Allied Worksheet
-                var worksheet2 = workbook.Worksheets.Add("Nursing & Allied");
-                worksheet2.Cell(1, 1).Value = "Name";
-                worksheet2.Cell(1, 2).Value = "Department/Unit/Office";
-                worksheet2.Cell(1, 3).Value = "Professional Category";
-                worksheet2.Cell(1, 4).Value = "Fit Test Solution";
-                worksheet2.Cell(1, 5).Value = "Status";
-                worksheet2.Cell(1, 6).Value = "Fit Tester";
-                worksheet2.Cell(1, 7).Value = "Date Fit Tested";
-                FormatHeaders(worksheet2, 7);
+                // Nursing & Allied Sheet
+                var ws2 = workbook.Worksheets.Add("Nursing & Allied");
+                ws2.Cell(1, 1).Value = "Name"; ws2.Cell(1, 2).Value = "Department/Unit/Office";
+                ws2.Cell(1, 3).Value = "Professional Category"; ws2.Cell(1, 4).Value = "Fit Test Solution";
+                ws2.Cell(1, 5).Value = "Status"; ws2.Cell(1, 6).Value = "Fit Tester"; ws2.Cell(1, 7).Value = "Date Fit Tested";
+                FormatHeaders(ws2, 7);
 
                 row = 2;
-                foreach (var item in attendanceForNursingAndAllied)
+                foreach (var n in attendanceForNursingAndAllied)
                 {
-                    worksheet2.Cell(row, 1).Value = item.HCW_Name;
-                    worksheet2.Cell(row, 2).Value = item.DUO;
-                    worksheet2.Cell(row, 3).Value = item.Professional_Category;
-                    worksheet2.Cell(row, 4).Value = item.Fit_Test_Solution;
-                    worksheet2.Cell(row, 5).Value = item.Test_Results;
-                    worksheet2.Cell(row, 6).Value = item.Name_of_Fit_Tester;
-                    worksheet2.Cell(row, 7).Value = item.SubmittedAt.ToString("yyyy-MM-dd");
+                    ws2.Cell(row, 1).Value = n.HCW_Name;
+                    ws2.Cell(row, 2).Value = n.DUO;
+                    ws2.Cell(row, 3).Value = n.Professional_Category;
+                    ws2.Cell(row, 4).Value = n.Fit_Test_Solution;
+                    ws2.Cell(row, 5).Value = n.Test_Results;
+                    ws2.Cell(row, 6).Value = n.Name_of_Fit_Tester;
+                    ws2.Cell(row, 7).Value = n.SubmittedAt.ToString("yyyy-MM-dd");
                     row++;
                 }
 
-                // COMPLETE Tally Report Worksheet with ALL columns
-                var worksheet3 = workbook.Worksheets.Add("DUO Unit Tally Report");
-                worksheet3.Cell(1, 1).Value = "Department / Unit";
-                worksheet3.Cell(1, 2).Value = "Total Staff";
-                worksheet3.Cell(1, 3).Value = "Total Fit Tested";
-                worksheet3.Cell(1, 4).Value = "Passed";
-                worksheet3.Cell(1, 5).Value = "Failed";
-                worksheet3.Cell(1, 6).Value = "Not Done";
-                worksheet3.Cell(1, 7).Value = "Expired";
-                worksheet3.Cell(1, 8).Value = "Rate (%)";
-                worksheet3.Cell(1, 9).Value = "3M Aura";
-                worksheet3.Cell(1, 10).Value = "Grand Total";
-                FormatHeaders(worksheet3, 10);
+                // Tally Report Sheet
+                var ws3 = workbook.Worksheets.Add("DUO Unit Tally Report");
+                ws3.Cell(1, 1).Value = "Department / Unit"; ws3.Cell(1, 2).Value = "Total Staff";
+                ws3.Cell(1, 3).Value = "Total Fit Tested"; ws3.Cell(1, 4).Value = "Passed";
+                ws3.Cell(1, 5).Value = "Failed"; ws3.Cell(1, 6).Value = "Not Done";
+                ws3.Cell(1, 7).Value = "Expired"; ws3.Cell(1, 8).Value = "Rate (%)";
+                ws3.Cell(1, 9).Value = "3M Aura"; ws3.Cell(1, 10).Value = "Grand Total";
+                FormatHeaders(ws3, 10);
 
                 row = 2;
-                foreach (var item in tallyReport)
+                foreach (var t in tallyReport)
                 {
-                    // Calculate rate percentage
-                    var rate = item.TotalStaff > 0 ? (item.TotalFitTested * 100.0 / item.TotalStaff) : 0;
-
-                    worksheet3.Cell(row, 1).Value = item.Unit;
-                    worksheet3.Cell(row, 2).Value = item.TotalStaff;
-                    worksheet3.Cell(row, 3).Value = item.TotalFitTested;
-                    worksheet3.Cell(row, 4).Value = item.Passed;
-                    worksheet3.Cell(row, 5).Value = item.Failed;
-                    worksheet3.Cell(row, 6).Value = item.NotDone;
-                    worksheet3.Cell(row, 7).Value = item.Expired;
-                    worksheet3.Cell(row, 8).Value = Math.Round(rate, 1);
-                    worksheet3.Cell(row, 9).Value = item.ThreeMAura;
-                    worksheet3.Cell(row, 10).Value = item.GrandTotal;
+                    var rate = t.TotalStaff > 0 ? (t.TotalFitTested * 100.0 / t.TotalStaff) : 0;
+                    ws3.Cell(row, 1).Value = t.Unit;
+                    ws3.Cell(row, 2).Value = t.TotalStaff;
+                    ws3.Cell(row, 3).Value = t.TotalFitTested;
+                    ws3.Cell(row, 4).Value = t.Passed;
+                    ws3.Cell(row, 5).Value = t.Failed;
+                    ws3.Cell(row, 6).Value = t.NotDone;
+                    ws3.Cell(row, 7).Value = t.Expired;
+                    ws3.Cell(row, 8).Value = Math.Round(rate, 1);
+                    ws3.Cell(row, 9).Value = t.ThreeMAura;
+                    ws3.Cell(row, 10).Value = t.GrandTotal;
                     row++;
                 }
 
-                // Add totals row to Tally Report
-                var totalRow = row;
-                worksheet3.Cell(totalRow, 1).Value = "TOTAL";
-                worksheet3.Cell(totalRow, 2).Value = tallyReport.Sum(t => t.TotalStaff);
-                worksheet3.Cell(totalRow, 3).Value = tallyReport.Sum(t => t.TotalFitTested);
-                worksheet3.Cell(totalRow, 4).Value = tallyReport.Sum(t => t.Passed);
-                worksheet3.Cell(totalRow, 5).Value = tallyReport.Sum(t => t.Failed);
-                worksheet3.Cell(totalRow, 6).Value = tallyReport.Sum(t => t.NotDone);
-                worksheet3.Cell(totalRow, 7).Value = tallyReport.Sum(t => t.Expired);
+                // Total Row
+                ws3.Cell(row, 1).Value = "TOTAL";
+                ws3.Cell(row, 2).Value = tallyReport.Sum(x => x.TotalStaff);
+                ws3.Cell(row, 3).Value = tallyReport.Sum(x => x.TotalFitTested);
+                ws3.Cell(row, 4).Value = tallyReport.Sum(x => x.Passed);
+                ws3.Cell(row, 5).Value = tallyReport.Sum(x => x.Failed);
 
-                // Calculate overall rate
-                var totalStaff = tallyReport.Sum(t => t.TotalStaff);
-                var totalFitTested = tallyReport.Sum(t => t.TotalFitTested);
-                var overallRate = totalStaff > 0 ? (totalFitTested * 100.0 / totalStaff) : 0;
-                worksheet3.Cell(totalRow, 8).Value = Math.Round(overallRate, 1);
+                ws3.Cell(row, 6).Value = tallyReport.Sum(x => x.NotDone);
+                ws3.Cell(row, 7).Value = tallyReport.Sum(x => x.Expired);
+                var totalRate = tallyReport.Sum(x => x.TotalStaff) > 0
+                    ? (tallyReport.Sum(x => x.TotalFitTested) * 100.0 / tallyReport.Sum(x => x.TotalStaff)) : 0;
+                ws3.Cell(row, 8).Value = Math.Round(totalRate, 1);
+                ws3.Cell(row, 9).Value = tallyReport.Sum(x => x.ThreeMAura);
+                ws3.Cell(row, 10).Value = tallyReport.Sum(x => x.GrandTotal);
 
-                worksheet3.Cell(totalRow, 9).Value = tallyReport.Sum(t => t.ThreeMAura);
-                worksheet3.Cell(totalRow, 10).Value = tallyReport.Sum(t => t.GrandTotal);
-
-                // Format total row
-                var totalRange = worksheet3.Range(totalRow, 1, totalRow, 10);
-                totalRange.Style.Font.Bold = true;
-                totalRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+                ws3.Range(row, 1, row, 10).Style.Font.Bold = true;
+                ws3.Range(row, 1, row, 10).Style.Fill.BackgroundColor = XLColor.LightGray;
 
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
-                    var content = stream.ToArray();
-                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Fit_Testing_Reports.xlsx");
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        $"Fit_Testing_Reports_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
                 }
             }
         }
-
         [HttpGet]
         public async Task<IActionResult> GetEmployeeDetails(string employeeId)
         {
