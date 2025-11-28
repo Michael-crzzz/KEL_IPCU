@@ -181,21 +181,30 @@
         </div>
     </div>
 </div>
-@if (Model.Test_Results != "Passed" && Model.SubmissionCount < Model.MaxRetakes)
+
+@if (Model.Test_Results == "Passed")
+{
+    <div class="text-center mt-4">
+        <a asp-action="GeneratePdf" asp-route-id="@Model.Id" class="btn btn-success">
+            Send PDF
+        </a>
+    </div>
+}
+else if (Model.SubmissionCount < 3)
 {
     <div class="text-center mt-4">
         <h5 class="text-muted">
-            You have @(Model.MaxRetakes - Model.SubmissionCount)
-            @(Model.MaxRetakes - Model.SubmissionCount == 1 ? "retake remaining" : "retakes remaining").
+            You have @(3 - Model.SubmissionCount)
+            @(3 - Model.SubmissionCount == 1 ? "retake remaining" : "retakes remaining").
         </h5>
 
         <!-- Retake Button -->
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#retakeModal">
-            <i class="fa fa-redo"></i> Submit Retake
+            Submit Retake
         </button>
     </div>
 
-    <!-- Retake Modal -->
+    <!-- Retake Modal - LOCKED FIELDS (100% unchanged from yours) -->
     <div class="modal fade" id="retakeModal" tabindex="-1" aria-labelledby="retakeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -207,59 +216,38 @@
                     <form asp-action="SubmitFitTest" method="post">
                         <input type="hidden" name="id" value="@Model.Id" />
 
-                        <!-- Fit Test Solution -->
-                        <div class="mb-3">
-                            <label for="fitTestType" class="form-label">Select Fit Test Solution</label>
-                            <select class="form-select" id="fitTestSolution" name="Fit_Test_Solution">
-                                <option value="" selected>Select Solution</option>
-                                <option value="Bitter Amer (FT-32)">Bitter Amer (FT-32)</option>
-                                <option value="Saccharin (FT-10)">Saccharin (FT-10)</option>
-                                <option value="3M Aura">3M Aura</option>
-                            </select>
+                        <input type="hidden" name="Fit_Test_Solution" value="@Model.Fit_Test_Solution" />
+                        <input type="hidden" name="Sensitivity_Test" value="@Model.Sensitivity_Test" />
+                        <input type="hidden" name="Respiratory_Type" value="@Model.Respiratory_Type" />
+                        <input type="hidden" name="Model" value="@Model.Model" />
+                        <input type="hidden" name="Size" value="@Model.Size" />
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Fit Test Solution</label>
+                                <input type="text" class="form-control" value="@Model.Fit_Test_Solution" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Sensitivity Test</label>
+                                <input type="text" class="form-control" value="@Model.Sensitivity_Test" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Respiratory Type</label>
+                                <input type="text" class="form-control" value="@Model.Respiratory_Type" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Model</label>
+                                <input type="text" class="form-control" value="@Model.Model" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Size</label>
+                                <input type="text" class="form-control" value="@Model.Size" disabled />
+                            </div>
                         </div>
 
-                        <!-- Sensitivity Test -->
-                        <div class="mb-3">
-                            <label for="sensitivityTest" class="form-label">Sensitivity Test</label>
-                            <input type="text" class="form-control" id="sensitivityTest" name="Sensitivity_Test" value="" />
-                        </div>
+                        <hr>
 
-                        <!-- Respiratory Type -->
-                        <div class="mb-3">
-                            <label for="respiratoryType" class="form-label">Respiratory Type</label>
-                            <select class="form-select" id="respiratoryType" name="Respiratory_Type">
-                                <option value="" selected>Select Respiratory Type</option>
-                                <option value="Bitter Amer (FT-32)">Bitter Amer (FT-32)</option>
-                                <option value="Saccharin (FT-10)">Saccharin (FT-10)</option>
-                                <option value="3M Aura">3M Aura</option>
-                            </select>
-                        </div>
-
-                        <!-- Model -->
-                        <div class="mb-3">
-                            <label asp-for="Model" class="form-label fw-bold">Model</label>
-                            <select asp-for="Model" class="form-select" id="model" name="Model">
-                                <option value="">Select Model</option>
-                                <option value="Flat-type">Flat-type</option>
-                                <option value="Aura">Aura</option>
-                            </select>
-                            <span asp-validation-for="Model" class="text-danger"></span>
-                        </div>
-
-                        <!-- Size -->
-                        <div class="mb-3">
-                            <label asp-for="Size" class="form-label fw-bold">Size</label>
-                            <select asp-for="Size" class="form-select" id="size" name="Size">
-                                <option value="">Select Size</option>
-                                <option value="Regular">Regular</option>
-                                <option value="1870+">1870+</option>
-                            </select>
-                            <span asp-validation-for="Size" class="text-danger"></span>
-                        </div>
-
-
-
-                        <!-- Breathing and Movement Tests -->
+                        <h6 class="fw-bold">Fit Test Activities (check if passed)</h6>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-check">
@@ -271,7 +259,6 @@
                                     <label class="form-check-label">Deep Breathing</label>
                                 </div>
                             </div>
-
                             <div class="col-md-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="Turn_head_side_to_side" value="true" />
@@ -282,7 +269,6 @@
                                     <label class="form-check-label">Move Head Up and Down</label>
                                 </div>
                             </div>
-
                             <div class="col-md-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="Reading" value="true" />
@@ -292,7 +278,6 @@
                                     <input class="form-check-input" type="checkbox" name="Bending_Jogging" value="true" />
                                     <label class="form-check-label">Bending/Jogging</label>
                                 </div>
-                                <!-- Add Normal Breathing 2 -->
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="Normal_Breathing_2" value="true" />
                                     <label class="form-check-label">Normal Breathing (2)</label>
@@ -300,18 +285,21 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary mt-3">Submit Retake</button>
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary">Submit Retake</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
 }
-else if (Model.Test_Results != "Passed")
+else
 {
     <div class="text-center mt-4">
         <h5 class="text-danger">No retakes remaining.</h5>
+        <a asp-action="GeneratePdf" asp-route-id="@Model.Id" class="btn btn-danger mt-3">
+            Send PDF
+        </a>
     </div>
 }

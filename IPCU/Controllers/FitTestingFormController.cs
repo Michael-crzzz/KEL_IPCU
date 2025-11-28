@@ -93,7 +93,12 @@ namespace IPCU.Controllers
             return View();
         }
 
-        // POST: FitTestingForm/Create
+
+
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FitTestingForm fitTestingForm, string? OtherLimitation)
@@ -102,16 +107,16 @@ namespace IPCU.Controllers
 
             try
             {
+                // Handle Limitations (including "Other")
                 var limitations = Request.Form["Limitation"].ToList();
-
                 if (limitations != null && limitations.Any())
                 {
                     if (limitations.Contains("Other"))
                     {
                         if (string.IsNullOrWhiteSpace(OtherLimitation))
                         {
-                            ModelState.AddModelError("Limitation", "Please specify the other limitation");
-                            ViewBag.DUO_Tester = new SelectList(new List<string> { /* same list */ });
+                            ModelState.AddModelError("OtherLimitation", "Please specify the other limitation.");
+                            PopulateViewBagDUOTester();
                             return View(fitTestingForm);
                         }
                         limitations.Remove("Other");
@@ -128,10 +133,12 @@ namespace IPCU.Controllers
                 {
                     fitTestingForm.SubmittedAt = DateTime.Now;
                     fitTestingForm.ExpiringAt = fitTestingForm.SubmittedAt.AddYears(1);
+                    fitTestingForm.SubmissionCount = 1; // First attempt
 
                     _context.Add(fitTestingForm);
                     await _context.SaveChangesAsync();
 
+                    // Save first attempt to history (no AttemptNumber needed)
                     var history = new FitTestingFormHistory
                     {
                         FitTestingFormId = fitTestingForm.Id,
@@ -154,40 +161,40 @@ namespace IPCU.Controllers
                     _context.FitTestingFormHistory.Add(history);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction(nameof(Index));
+                    // Success message + redirect to Details page
+                    TempData["SuccessMessage"] = "Fit testing record successfully created!";
+
+                    return RedirectToAction(nameof(Details), new { id = fitTestingForm.Id });
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
+                ModelState.AddModelError("", "An error occurred: " + ex.Message);
             }
 
-            ViewBag.DUO_Tester = new SelectList(new List<string>
-            {
-                "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
-                "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
-                "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
-                "iVASC", "OPS", "AITU", "PCU", "IPCU"
-            });
-
+            PopulateViewBagDUOTester();
             return View(fitTestingForm);
         }
 
-        // GET: FitTestingForm/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        private void PopulateViewBagDUOTester()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var fitTestingForm = await _context.FitTestingForm.FindAsync(id);
-            if (fitTestingForm == null)
-            {
-                return NotFound();
-            }
-            return View(fitTestingForm);
+            ViewBag.DUO_Tester = new SelectList(new List<string>
+    {
+        "Unit 2A", "Unit 2B", "Unit 2C", "Unit 2D", "Unit 2E/Ext",
+        "Unit 2F/2G", "Unit 2H", "Unit 3A", "Unit 3B", "Unit 3C", "Unit 3D/Celtran",
+        "Unit 3E", "Unit 3F", "ICU", "ER", "PD", "HDU", "AEUC", "ORU", "CCRU",
+        "iVASC", "OPS", "AITU", "PCU", "IPCU"
+    });
         }
+
+
+
+
+
+
+
+
+
 
         // POST: FitTestingForm/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -275,59 +282,71 @@ namespace IPCU.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult SubmitFitTest(int id, FitTestingForm updatedForm)
+        public async Task<IActionResult> SubmitFitTest(int id, FitTestingForm updatedForm)
         {
-            var fitTest = _context.FitTestingForm.FirstOrDefault(f => f.Id == id);
-            if (fitTest != null && fitTest.SubmissionCount < fitTest.MaxRetakes)
+            var fitTest = await _context.FitTestingForm.FindAsync(id);
+            if (fitTest == null) return NotFound();
+
+            // Prevent nulls on required fields
+            if (string.IsNullOrWhiteSpace(updatedForm.Respiratory_Type) ||
+                string.IsNullOrWhiteSpace(updatedForm.Fit_Test_Solution) ||
+                string.IsNullOrWhiteSpace(updatedForm.Model) ||
+                string.IsNullOrWhiteSpace(updatedForm.Size))
             {
-                // Update the main form with the new data FIRST
-                fitTest.Fit_Test_Solution = updatedForm.Fit_Test_Solution;
-                fitTest.Sensitivity_Test = updatedForm.Sensitivity_Test;
-                fitTest.Respiratory_Type = updatedForm.Respiratory_Type;
-                fitTest.Model = updatedForm.Model;
-                fitTest.Size = updatedForm.Size;
-                fitTest.Normal_Breathing = updatedForm.Normal_Breathing;
-                fitTest.Deep_Breathing = updatedForm.Deep_Breathing;
-                fitTest.Turn_head_side_to_side = updatedForm.Turn_head_side_to_side;
-                fitTest.Move_head_up_and_down = updatedForm.Move_head_up_and_down;
-                fitTest.Reading = updatedForm.Reading;
-                fitTest.Bending_Jogging = updatedForm.Bending_Jogging;
-                fitTest.Normal_Breathing_2 = updatedForm.Normal_Breathing_2;
-
-                // Update the submission count and submission date
-                fitTest.SubmissionCount++;
-                fitTest.SubmittedAt = DateTime.Now; // Update the submission date for the main form
-
-                // Save the updated FitTestingForm to the database
-                _context.SaveChanges(); // Save the updated main form
-
-                // NOW, save the current state to FitTestingFormHistory
-                var history = new FitTestingFormHistory
-                {
-                    FitTestingFormId = fitTest.Id,
-                    Fit_Test_Solution = fitTest.Fit_Test_Solution, // Use the updated data
-                    Sensitivity_Test = fitTest.Sensitivity_Test,
-                    Respiratory_Type = fitTest.Respiratory_Type,
-                    Model = fitTest.Model,
-                    Size = fitTest.Size,
-                    Normal_Breathing = fitTest.Normal_Breathing,
-                    Deep_Breathing = fitTest.Deep_Breathing,
-                    Turn_head_side_to_side = fitTest.Turn_head_side_to_side,
-                    Move_head_up_and_down = fitTest.Move_head_up_and_down,
-                    Reading = fitTest.Reading,
-                    Bending_Jogging = fitTest.Bending_Jogging,
-                    Normal_Breathing_2 = fitTest.Normal_Breathing_2,
-                    Test_Results = fitTest.Test_Results,
-                    SubmittedAt = fitTest.SubmittedAt // Use the updated submission date
-                };
-
-                // Add the history entry to the database
-                _context.FitTestingFormHistory.Add(history);
-                _context.SaveChanges(); // Save history entry
+                TempData["Error"] = "All fields are required for retake.";
+                return RedirectToAction(nameof(Details), new { id });
             }
 
-            return RedirectToAction("Details", new { id });
+            // Update only the fields that can change during retake
+            fitTest.Fit_Test_Solution = updatedForm.Fit_Test_Solution;
+            fitTest.Sensitivity_Test = updatedForm.Sensitivity_Test;
+            fitTest.Respiratory_Type = updatedForm.Respiratory_Type;
+            fitTest.Model = updatedForm.Model;
+            fitTest.Size = updatedForm.Size;
+
+            // Update breathing tests
+            fitTest.Normal_Breathing = updatedForm.Normal_Breathing;
+            fitTest.Deep_Breathing = updatedForm.Deep_Breathing;
+            fitTest.Turn_head_side_to_side = updatedForm.Turn_head_side_to_side;
+            fitTest.Move_head_up_and_down = updatedForm.Move_head_up_and_down;
+            fitTest.Reading = updatedForm.Reading;
+            fitTest.Bending_Jogging = updatedForm.Bending_Jogging;
+            fitTest.Normal_Breathing_2 = updatedForm.Normal_Breathing_2;
+
+            fitTest.Test_Results = updatedForm.Test_Results; // "Passed" or "Failed"
+
+            fitTest.SubmissionCount++;
+            fitTest.SubmittedAt = DateTime.Now;
+
+            // Save main record
+            _context.Update(fitTest);
+            await _context.SaveChangesAsync();
+
+            // Save to history
+            var history = new FitTestingFormHistory
+            {
+                FitTestingFormId = fitTest.Id,
+                Fit_Test_Solution = fitTest.Fit_Test_Solution,
+                Sensitivity_Test = fitTest.Sensitivity_Test,
+                Respiratory_Type = fitTest.Respiratory_Type,
+                Model = fitTest.Model,
+                Size = fitTest.Size,
+                Normal_Breathing = fitTest.Normal_Breathing,
+                Deep_Breathing = fitTest.Deep_Breathing,
+                Turn_head_side_to_side = fitTest.Turn_head_side_to_side,
+                Move_head_up_and_down = fitTest.Move_head_up_and_down,
+                Reading = fitTest.Reading,
+                Bending_Jogging = fitTest.Bending_Jogging,
+                Normal_Breathing_2 = fitTest.Normal_Breathing_2,
+                Test_Results = fitTest.Test_Results,
+                SubmittedAt = DateTime.Now
+            };
+
+            _context.FitTestingFormHistory.Add(history);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Retake #{fitTest.SubmissionCount} submitted successfully!";
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         public IActionResult Reports()
